@@ -22,6 +22,7 @@ class Pelican_Engine {
         require_once $base . 'class-installer.php';
         require_once $base . 'class-hub-registry.php';
         require_once $base . 'class-i18n.php';
+        require_once $base . 'class-order-tracker.php';
 
         require_once $base . 'builders/class-builder-csv.php';
         require_once $base . 'builders/class-builder-json.php';
@@ -50,6 +51,7 @@ class Pelican_Engine {
         /* v1.4.8 — disabled: Hub registry is single source of truth. */
         // Pelican_Hub_Registry::init();
         Pelican_I18n::init();
+        Pelican_Order_Tracker::init();
         Pelican_Cron::init();
         Pelican_Auto_Trigger::init();
         Pelican_Webhooks::init();
