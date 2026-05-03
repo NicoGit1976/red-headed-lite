@@ -44,6 +44,10 @@ class Pelican_Export_Engine {
                 throw new \RuntimeException( 'File build failed.' );
             }
 
+            /* v1.4.24 — runtime context for filename resolver. */
+            $profile['_job_id']      = $job_id;
+            $profile['_records']     = count( $rows );
+            $profile['_first_order'] = ! empty( $orders ) ? $orders[0] : null;
             $delivered = self::deliver( $file, $profile, $format );
 
             $duration = (int) round( microtime( true ) * 1000 ) - $started;

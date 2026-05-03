@@ -274,7 +274,11 @@
                 '<input type="number" class="pl-dest-port" placeholder="22" value="' + ( d.port || 22 ) + '" />' +
                 '<input type="text" class="pl-dest-user" placeholder="user" value="' + ( d.user || '' ) + '" />' +
                 '<input type="password" class="pl-dest-pass" placeholder="password" autocomplete="new-password" />' +
-                '<input type="text" class="pl-dest-path" placeholder="/incoming/" value="' + ( d.path || '/' ) + '" />';
+                '<input type="text" class="pl-dest-path" placeholder="/incoming/" value="' + ( d.path || '/' ) + '" />' +
+                '<input type="text" class="pl-dest-sftp-filename" placeholder="Filename pattern (optional, e.g. order-{order_number}-{date}.{format})" value="' + ( d.filename_pattern || '' ).replace( /"/g, '&quot;' ) + '" />' +
+                '<p class="pl-muted" style="margin:6px 0 0;font-size:11px;line-height:1.45;">' +
+                    '⚙ <strong>Filename placeholders:</strong> <code>{profile}</code> · <code>{format}</code> · <code>{records}</code> · <code>{date}</code> · <code>{time}</code> · <code>{datetime}</code> · <code>{order_number}</code> · <code>{customer_email}</code> · <code>{random}</code>. Empty = auto-generated.' +
+                '</p>';
         } else if ( type === 'rest' ) {
             box.innerHTML =
                 '<input type="url" class="pl-dest-url" placeholder="https://api.example.com/orders" value="' + ( d.url || '' ) + '" />' +
@@ -299,6 +303,8 @@
                 var pw = wrap.querySelector( '.pl-dest-pass' ).value;
                 if ( pw ) d.pass = pw;
                 d.path = wrap.querySelector( '.pl-dest-path' ).value;
+                var sftpFn = wrap.querySelector( '.pl-dest-sftp-filename' );
+                if ( sftpFn ) d.filename_pattern = sftpFn.value;
             }
             if ( type === 'rest' ) {
                 d.url   = wrap.querySelector( '.pl-dest-url' ).value;
