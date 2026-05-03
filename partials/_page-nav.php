@@ -6,12 +6,12 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  * @package Pelican
  */
 $_pl_pages = array(
-    'pelican'          => array( 'icon' => '📊', 'label' => __( 'Dashboard', 'pelican' ) ),
-    'pelican-exports'  => array( 'icon' => '📦', 'label' => __( 'Exports',   'pelican' ) ),
-    'pelican-settings' => array( 'icon' => '⚙️', 'label' => __( 'Settings',  'pelican' ) ),
+    'red-headed-lite'          => array( 'icon' => '📊', 'label' => __( 'Dashboard', 'pelican' ) ),
+    'red-headed-lite-exports'  => array( 'icon' => '📦', 'label' => __( 'Exports',   'pelican' ) ),
+    'red-headed-lite-settings' => array( 'icon' => '⚙️', 'label' => __( 'Settings',  'pelican' ) ),
 );
-$_pl_current = isset( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : 'pelican';
-if ( strpos( $_pl_current, 'pelican-settings' ) === 0 ) $_pl_current = 'pelican-settings';
+$_pl_current = isset( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : 'red-headed-lite';
+if ( strpos( $_pl_current, 'red-headed-lite-settings' ) === 0 ) $_pl_current = 'red-headed-lite-settings';
 ?>
 <nav class="pl-page-nav" role="navigation" aria-label="Red-Headed sections">
     <?php foreach ( $_pl_pages as $slug => $meta ) :
