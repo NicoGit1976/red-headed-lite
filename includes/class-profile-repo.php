@@ -44,6 +44,10 @@ class Pelican_Profile_Repo {
     }
 
     protected static function encode( $data ) {
+        $meta = is_array( $data['schedule_meta'] ?? null ) ? $data['schedule_meta'] : array();
+        foreach ( array( 'post_export_status', 'export_mode', 'line_item_header_fill' ) as $k ) {
+            if ( isset( $data[ $k ] ) ) $meta[ $k ] = sanitize_text_field( (string) $data[ $k ] );
+        }
         return array(
             'name'           => sanitize_text_field( $data['name']     ?? 'Untitled profile' ),
             'format'         => sanitize_key(        $data['format']   ?? 'csv' ),
@@ -51,7 +55,7 @@ class Pelican_Profile_Repo {
             'columns'        => wp_json_encode(      $data['columns']  ?? Pelican_Export_Engine::default_columns() ),
             'destinations'   => wp_json_encode(      $data['destinations'] ?? array() ),
             'schedule'       => sanitize_key(        $data['schedule'] ?? 'manual' ),
-            'schedule_meta'  => wp_json_encode(      $data['schedule_meta'] ?? array() ),
+            'schedule_meta'  => wp_json_encode(      $meta ),
             'auto_trigger'   => wp_json_encode(      $data['auto_trigger']  ?? array() ),
             'status'         => sanitize_key(        $data['status']   ?? 'active' ),
         );
@@ -60,6 +64,9 @@ class Pelican_Profile_Repo {
         if ( ! is_array( $row ) ) return $row;
         foreach ( array( 'filters', 'columns', 'destinations', 'schedule_meta', 'auto_trigger' ) as $f ) {
             $row[ $f ] = ! empty( $row[ $f ] ) ? ( json_decode( $row[ $f ], true ) ?: array() ) : array();
+        }
+        foreach ( array( 'post_export_status', 'export_mode', 'line_item_header_fill' ) as $k ) {
+            if ( isset( $row['schedule_meta'][ $k ] ) ) $row[ $k ] = $row['schedule_meta'][ $k ];
         }
         return $row;
     }

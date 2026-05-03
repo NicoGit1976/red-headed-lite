@@ -36,6 +36,18 @@ $total_pages = max( 1, (int) ceil( $total / $per ) );
 $is_pro = Pelican_Soft_Lock::is_pro();
 ?>
 <div class="pl-wrap wrap">
+    <?php
+    if ( class_exists( 'FH_UI_Helper' ) ) {
+        FH_UI_Helper::render_header(
+            'Red-Headed Lite',
+            __( 'Exports Orders Everywhere, Anytime', 'pelican' ),
+            'mascot-redheaded-v1.svg',
+            array(),
+            'red-headed-lite'
+        );
+    }
+    ?>
+
     <?php include PELICAN_PATH . 'partials/_page-nav.php'; ?>
 
     <section class="pl-section">
