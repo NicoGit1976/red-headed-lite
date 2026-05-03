@@ -341,6 +341,20 @@ class Pelican_Export_Engine {
             if ( $i > 1 && ! $multi_ok ) break; /* Lite caps to 1 destination per run */
             $ok = Pelican_Destination_Dispatcher::ship( $dest, $file, $profile, $format );
             $delivered[] = array( 'destination' => $dest, 'ok' => $ok );
+            /* v1.4.23 — surface delivery errors (mirror Pro v1.4.25). */
+            if ( is_wp_error( $ok ) ) {
+                $msg = '[Pelican] destination ' . ( $dest['type'] ?? '?' ) . ' failed: ' . $ok->get_error_code() . ' — ' . $ok->get_error_message();
+                error_log( $msg );
+                global $wpdb;
+                $jid = isset( $profile['_job_id'] ) ? (int) $profile['_job_id'] : 0;
+                if ( $jid ) {
+                    $existing = (string) $wpdb->get_var( $wpdb->prepare( "SELECT error_message FROM {$wpdb->prefix}pl_jobs WHERE id = %d", $jid ) );
+                    $append = trim( $existing . "\n" . $msg );
+                    $wpdb->update( "{$wpdb->prefix}pl_jobs", array( 'error_message' => substr( $append, 0, 1500 ) ), array( 'id' => $jid ) );
+                }
+            } else {
+                error_log( '[Pelican] destination ' . ( $dest['type'] ?? '?' ) . ' OK' );
+            }
         }
         return $delivered;
     }
