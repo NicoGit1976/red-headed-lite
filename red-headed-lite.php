@@ -3,7 +3,7 @@
  * Plugin Name:       Red-Headed Lite — Exports Orders Everywhere, Anytime
  * Plugin URI:        https://thelionfrog.com
  * Description:       Exports WooCommerce orders everywhere, anytime — Lite edition. Manual + bulk to CSV via Email or SFTP. Mascot: Red-Headed Poison Frog. Part of Ultimate Woo Powertools (by The Lion Frog).
- * Version:           1.4.16
+ * Version:           1.4.17
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            The Lion Frog Team
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'PELICAN_VERSION', '1.4.16' );
+define( 'PELICAN_VERSION', '1.4.17' );
 define( 'PELICAN_EDITION',  'lite' );
 define( 'PELICAN_FILE',     __FILE__ );
 define( 'PELICAN_PATH',     plugin_dir_path( __FILE__ ) );
@@ -65,6 +65,27 @@ add_action( 'plugins_loaded', function () {
         return $actions;
     } );
 }, 5 );
+/* v1.4.17 — Download handler. Fires at admin_init prio 1 BEFORE any HTML output. */
+add_action( 'admin_init', function () {
+    $dl = ! empty( $_GET['rh_dl'] ) ? (int) $_GET['rh_dl'] : ( ! empty( $_GET['pelican_dl'] ) ? (int) $_GET['pelican_dl'] : 0 );
+    if ( ! $dl ) return;
+    if ( ! current_user_can( 'manage_options' ) ) return;
+    global $wpdb;
+    $jobs_tbl = $wpdb->prefix . 'pl_jobs';
+    $j = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$jobs_tbl} WHERE id = %d", $dl ), ARRAY_A );
+    if ( ! $j || empty( $j['file_path'] ) ) return;
+    $u = wp_upload_dir();
+    $abs = trailingslashit( $u['basedir'] ) . ltrim( $j['file_path'], '/\\' );
+    if ( ! file_exists( $abs ) ) return;
+    while ( ob_get_level() ) ob_end_clean();
+    nocache_headers();
+    header( 'Content-Type: application/octet-stream' );
+    header( 'Content-Disposition: attachment; filename="' . basename( $abs ) . '"' );
+    header( 'Content-Length: ' . filesize( $abs ) );
+    readfile( $abs );
+    exit;
+}, 1 );
+
 /* Brand-rename — 301 from legacy 'pelican*' / 'woo-order-lite' admin URLs to new
    'red-headed-lite*' (preserves bookmarks). */
 add_action( 'admin_init', function () {

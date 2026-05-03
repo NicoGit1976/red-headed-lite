@@ -8,25 +8,8 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 global $wpdb;
 $jobs_tbl = $wpdb->prefix . 'pl_jobs';
 
-/* Handle one-shot download via signed link.
-   v1.4.16 — Renamed query param pelican_dl → rh_dl + cap to manage_options. */
-$_dl = ! empty( $_GET['rh_dl'] ) ? $_GET['rh_dl'] : ( ! empty( $_GET['pelican_dl'] ) ? $_GET['pelican_dl'] : 0 );
-if ( $_dl && current_user_can( 'manage_options' ) ) {
-    $jid = (int) $_dl;
-    $j   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$jobs_tbl} WHERE id = %d", $jid ), ARRAY_A );
-    if ( $j && ! empty( $j['file_path'] ) ) {
-        $u = wp_upload_dir();
-        $abs = trailingslashit( $u['basedir'] ) . ltrim( $j['file_path'], '/\\' );
-        if ( file_exists( $abs ) ) {
-            nocache_headers();
-            header( 'Content-Type: application/octet-stream' );
-            header( 'Content-Disposition: attachment; filename="' . basename( $abs ) . '"' );
-            header( 'Content-Length: ' . filesize( $abs ) );
-            readfile( $abs );
-            exit;
-        }
-    }
-}
+/* v1.4.17 — Download handler moved to admin_init in main plugin file (was here
+   at render-time which mixed HTML with the binary). See red-headed-lite.php. */
 
 /* Filters */
 $f_status = isset( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : '';
