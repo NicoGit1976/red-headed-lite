@@ -47,7 +47,8 @@ class Pelican_Engine {
         add_action( 'plugins_loaded', array( $this, 'on_plugins_loaded' ) );
         add_action( 'admin_init', array( 'Pelican_Installer', 'maybe_upgrade' ) );
 
-        Pelican_Hub_Registry::init();
+        /* v1.4.8 — disabled: Hub registry is single source of truth. */
+        // Pelican_Hub_Registry::init();
         Pelican_I18n::init();
         Pelican_Cron::init();
         Pelican_Auto_Trigger::init();
