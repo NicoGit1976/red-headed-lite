@@ -15,20 +15,12 @@ $tabs = array(
 $active = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'profiles';
 if ( ! isset( $tabs[ $active ] ) ) $active = 'profiles';
 ?>
-<div class="pl-wrap wrap">
-    <?php
-    if ( class_exists( 'FH_UI_Helper' ) ) {
-        FH_UI_Helper::render_header(
-            'Red Headed Lite',
-            __( 'Exports Orders Everywhere, Anytime', 'red-headed-lite' ),
-            'red-headed-lite.webp',
-            array(),
-            'red-headed-lite'
-        );
-    }
-    ?>
-
-    <?php include RED_HEADED_PATH . 'partials/_page-nav.php'; ?>
+<?php
+/* Charte v1 §4 — canonical Hub cockpit (header + .fh-tab nav + 2-col grid).
+   Inner sub-tabs (.pl-tabs) keep the pill pattern, active = orange (charte §5B). */
+Red_Headed_Admin::open_cockpit_shell( 'red-headed-lite-settings' );
+FH_UI_Helper::open_cockpit_main();
+?>
 
     <section class="pl-section">
         <h2 class="pl-h2"><?php esc_html_e( '⚙️ Settings', 'red-headed-lite' ); ?></h2>
@@ -54,4 +46,15 @@ if ( ! isset( $tabs[ $active ] ) ) $active = 'profiles';
             ?>
         </div>
     </section>
-</div>
+<?php
+/* ── SIDEBAR : CTA / navigation only. ── */
+FH_UI_Helper::close_cockpit_main();
+FH_UI_Helper::open_cockpit_sidebar( __( 'Quick actions', 'red-headed-lite' ) );
+FH_UI_Helper::render_sidebar_card( __( 'Quick actions', 'red-headed-lite' ), array(
+    array( 'icon' => '📊', 'label' => __( 'Dashboard', 'red-headed-lite' ), 'url' => admin_url( 'admin.php?page=red-headed-lite' ) ),
+    array( 'icon' => '📦', 'label' => __( 'Exports', 'red-headed-lite' ),   'url' => admin_url( 'admin.php?page=red-headed-lite-exports' ) ),
+    array( 'icon' => '🛒', 'label' => __( 'WC Orders', 'red-headed-lite' ), 'url' => admin_url( 'edit.php?post_type=shop_order' ) ),
+) );
+FH_UI_Helper::close_cockpit_sidebar();
+FH_UI_Helper::close_cockpit();
+?>

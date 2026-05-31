@@ -65,6 +65,29 @@ class Red_Headed_Admin {
     public function render_exports()   { include RED_HEADED_PATH . 'partials/view-exports.php'; }
     public function render_settings()  { include RED_HEADED_PATH . 'partials/view-settings.php'; }
 
+    /**
+     * Open the canonical Hub cockpit shell (header + .fh-tab top nav + .lf-page).
+     * Shared by all 3 views. Charte v1 §4 (cockpit) + §5B (Hub .fh-tab, no third tab style).
+     * Mirrors Red Headed Pro (same session, per Lite↔Pro alignment rule).
+     *
+     * @param string $active_tab  One of red-headed-lite | -exports | -settings.
+     */
+    public static function open_cockpit_shell( $active_tab ) {
+        if ( ! class_exists( 'FH_UI_Helper' ) ) { echo '<div class="lf-page lf-page-red-headed-lite wrap">'; return; }
+        $base = admin_url( 'admin.php?page=' );
+        FH_UI_Helper::open_cockpit( array(
+            'title'       => 'Red Headed Lite',
+            'baseline'    => __( 'Exports Orders Everywhere, Anytime', 'red-headed-lite' ),
+            'plugin_slug' => 'red-headed-lite',
+            'active_tab'  => $active_tab,
+            'tabs'        => array(
+                'red-headed-lite'          => array( 'icon' => '📊', 'label' => __( 'Dashboard', 'red-headed-lite' ), 'url' => $base . 'red-headed-lite' ),
+                'red-headed-lite-exports'  => array( 'icon' => '📦', 'label' => __( 'Exports',   'red-headed-lite' ), 'url' => $base . 'red-headed-lite-exports' ),
+                'red-headed-lite-settings' => array( 'icon' => '⚙️', 'label' => __( 'Settings',  'red-headed-lite' ), 'url' => $base . 'red-headed-lite-settings' ),
+            ),
+        ) );
+    }
+
     /* ────────── AJAX ────────── */
     public function ajax_save_profile() {
         check_ajax_referer( 'red-headed-lite', 'nonce' );

@@ -29,28 +29,19 @@ $formats = array(
 );
 $by_format_map = array(); foreach ( (array) $by_format as $r ) $by_format_map[ $r['format'] ] = (int) $r['n'];
 ?>
-<div class="pl-wrap wrap">
-    <?php
-    /* v1.4.26 — Canonical Hub-rendered header (Lite-Pro alignment with Pro v1.4.28). */
-    if ( class_exists( 'FH_UI_Helper' ) ) {
-        FH_UI_Helper::render_header(
-            'Red Headed Lite',
-            __( 'Exports Orders Everywhere, Anytime', 'red-headed-lite' ),
-            'red-headed-lite.webp',
-            array(),
-            'red-headed-lite'
-        );
-    }
-    ?>
+<?php
+/* Charte v1 §4 — canonical Hub cockpit: header + .fh-tab top nav + 2-col grid.
+   Replaces the legacy .pl-wrap full-width layout + .pl-page-nav. */
+Red_Headed_Admin::open_cockpit_shell( 'red-headed-lite' );
+FH_UI_Helper::open_cockpit_main();
 
-    <?php include RED_HEADED_PATH . 'partials/_page-nav.php'; ?>
-
-    <section class="pl-kpis">
-        <div class="pl-kpi"><div class="pl-kpi-icon">📊</div><div><div class="pl-kpi-num"><?php echo (int) $stats['total']; ?></div><div class="pl-kpi-lbl"><?php esc_html_e( 'Total exports', 'red-headed-lite' ); ?></div></div></div>
-        <div class="pl-kpi"><div class="pl-kpi-icon">📅</div><div><div class="pl-kpi-num"><?php echo (int) $stats['this_month']; ?></div><div class="pl-kpi-lbl"><?php esc_html_e( 'This month', 'red-headed-lite' ); ?></div></div></div>
-        <div class="pl-kpi"><div class="pl-kpi-icon">✓</div><div><div class="pl-kpi-num"><?php echo (int) $stats['success']; ?></div><div class="pl-kpi-lbl"><?php esc_html_e( 'Successful', 'red-headed-lite' ); ?></div></div></div>
-        <div class="pl-kpi <?php echo $stats['failed'] > 0 ? 'pl-kpi-warn' : ''; ?>"><div class="pl-kpi-icon">⚠️</div><div><div class="pl-kpi-num"><?php echo (int) $stats['failed']; ?></div><div class="pl-kpi-lbl"><?php esc_html_e( 'Failed', 'red-headed-lite' ); ?></div></div></div>
-    </section>
+FH_UI_Helper::render_kpi_strip( array(
+    array( 'icon' => '📊', 'value' => (int) $stats['total'],      'label' => __( 'Total exports', 'red-headed-lite' ) ),
+    array( 'icon' => '📅', 'value' => (int) $stats['this_month'], 'label' => __( 'This month', 'red-headed-lite' ) ),
+    array( 'icon' => '✓',  'value' => (int) $stats['success'],    'label' => __( 'Successful', 'red-headed-lite' ), 'tone' => 'success' ),
+    array( 'icon' => '⚠️', 'value' => (int) $stats['failed'],     'label' => __( 'Failed', 'red-headed-lite' ), 'tone' => $stats['failed'] > 0 ? 'bad' : 'info' ),
+) );
+?>
 
     <section class="pl-section">
         <h2 class="pl-h2"><?php esc_html_e( '🗂️ Available formats', 'red-headed-lite' ); ?></h2>
@@ -109,52 +100,35 @@ $by_format_map = array(); foreach ( (array) $by_format as $r ) $by_format_map[ $
         <?php endif; ?>
     </section>
 
-    <section class="pl-section">
-        <h2 class="pl-h2"><?php esc_html_e( '⚡ Quick actions', 'red-headed-lite' ); ?></h2>
-        <div class="pl-actions">
-            <a href="<?php echo esc_url( admin_url( 'admin.php?page=red-headed-lite-settings-profiles' ) ); ?>" class="pl-action">
-                <span class="pl-action-icon">📁</span>
-                <span class="pl-action-label"><?php esc_html_e( 'Profiles', 'red-headed-lite' ); ?></span>
-                <span class="pl-action-meta"><?php echo (int) $profiles_n; ?> / <?php echo $is_pro ? '∞' : '1'; ?></span>
-            </a>
-            <a href="<?php echo esc_url( admin_url( 'admin.php?page=red-headed-lite-exports' ) ); ?>" class="pl-action">
-                <span class="pl-action-icon">📦</span>
-                <span class="pl-action-label"><?php esc_html_e( 'Exports', 'red-headed-lite' ); ?></span>
-            </a>
-            <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=shop_order' ) ); ?>" class="pl-action">
-                <span class="pl-action-icon">🛒</span>
-                <span class="pl-action-label"><?php esc_html_e( 'WC Orders', 'red-headed-lite' ); ?></span>
-            </a>
-            <a href="<?php echo esc_url( admin_url( 'admin.php?page=red-headed-lite-settings-destinations' ) ); ?>" class="pl-action">
-                <span class="pl-action-icon">📡</span>
-                <span class="pl-action-label"><?php esc_html_e( 'Destinations', 'red-headed-lite' ); ?></span>
-            </a>
-            <?php if ( $is_pro ) : ?>
-                <a href="<?php echo esc_url( admin_url( 'admin.php?page=red-headed-lite-settings-cron' ) ); ?>" class="pl-action">
-                    <span class="pl-action-icon">⏰</span>
-                    <span class="pl-action-label"><?php esc_html_e( 'Cron schedules', 'red-headed-lite' ); ?></span>
-                </a>
-                <a href="<?php echo esc_url( admin_url( 'admin.php?page=red-headed-lite-settings-webhooks' ) ); ?>" class="pl-action">
-                    <span class="pl-action-icon">🔔</span>
-                    <span class="pl-action-label"><?php esc_html_e( 'Webhooks', 'red-headed-lite' ); ?></span>
-                </a>
-            <?php endif; ?>
-        </div>
-    </section>
+<?php
+/* ── SIDEBAR : CTA / navigation only (operational tables stay in MAIN). ── */
+FH_UI_Helper::close_cockpit_main();
+FH_UI_Helper::open_cockpit_sidebar( __( 'Quick actions', 'red-headed-lite' ) );
 
-    <?php if ( ! $is_pro ) : ?>
-    <section class="pl-section">
-        <h2 class="pl-h2"><?php esc_html_e( '✉️ Email quota', 'red-headed-lite' ); ?></h2>
-        <div class="pl-quota-bar"><div class="pl-quota-fill" style="width: <?php echo (int) min( 100, ( $rate['sent_24h'] / max( 1, $rate['limit'] ) ) * 100 ); ?>%;"></div></div>
-        <p class="pl-quota-text">
-            <?php
-            printf(
-                /* translators: 1: sent, 2: limit, 3: remaining */
-                esc_html__( '%1$d / %2$d emails sent (24h sliding) — %3$d remaining. Pro = unlimited.', 'red-headed-lite' ),
-                (int) $rate['sent_24h'], (int) $rate['limit'], (int) $rate['remaining']
-            );
-            ?>
-        </p>
-    </section>
-    <?php endif; ?>
-</div>
+$rh_qa = array(
+    array( 'icon' => '📁', 'label' => __( 'Profiles', 'red-headed-lite' ),     'url' => admin_url( 'admin.php?page=red-headed-lite-settings-profiles' ),     'value' => $profiles_n . ' / ' . ( $is_pro ? '∞' : '1' ) ),
+    array( 'icon' => '📦', 'label' => __( 'Exports', 'red-headed-lite' ),      'url' => admin_url( 'admin.php?page=red-headed-lite-exports' ) ),
+    array( 'icon' => '🛒', 'label' => __( 'WC Orders', 'red-headed-lite' ),    'url' => admin_url( 'edit.php?post_type=shop_order' ) ),
+    array( 'icon' => '📡', 'label' => __( 'Destinations', 'red-headed-lite' ), 'url' => admin_url( 'admin.php?page=red-headed-lite-settings-destinations' ) ),
+);
+if ( $is_pro ) {
+    $rh_qa[] = array( 'icon' => '⏰', 'label' => __( 'Cron schedules', 'red-headed-lite' ), 'url' => admin_url( 'admin.php?page=red-headed-lite-settings-cron' ) );
+    $rh_qa[] = array( 'icon' => '🔔', 'label' => __( 'Webhooks', 'red-headed-lite' ),       'url' => admin_url( 'admin.php?page=red-headed-lite-settings-webhooks' ) );
+}
+FH_UI_Helper::render_sidebar_card( __( 'Quick actions', 'red-headed-lite' ), $rh_qa );
+
+if ( ! $is_pro ) {
+    echo '<div class="fh-sb-card">';
+    echo '<h3 class="fh-sb-title">' . esc_html__( 'Email quota', 'red-headed-lite' ) . '</h3>';
+    echo '<div class="pl-quota-bar"><div class="pl-quota-fill" style="width:' . (int) min( 100, ( $rate['sent_24h'] / max( 1, $rate['limit'] ) ) * 100 ) . '%;"></div></div>';
+    echo '<p class="pl-quota-text">' . sprintf(
+        /* translators: 1: sent, 2: limit, 3: remaining */
+        esc_html__( '%1$d / %2$d emails sent (24h sliding) — %3$d remaining. Pro = unlimited.', 'red-headed-lite' ),
+        (int) $rate['sent_24h'], (int) $rate['limit'], (int) $rate['remaining']
+    ) . '</p>';
+    echo '</div>';
+}
+
+FH_UI_Helper::close_cockpit_sidebar();
+FH_UI_Helper::close_cockpit();
+?>

@@ -51,20 +51,11 @@ if ( isset( $_POST['rh_clear_logs'] ) && check_admin_referer( 'rh_clear_logs' ) 
     $stats_24h = array( 'success_count' => 0, 'error_count' => 0, 'total_syncs' => 0, 'avg_duration' => 0 );
 }
 ?>
-<div class="pl-wrap wrap">
-    <?php
-    if ( class_exists( 'FH_UI_Helper' ) ) {
-        FH_UI_Helper::render_header(
-            'Red Headed Lite',
-            __( 'Exports Orders Everywhere, Anytime', 'red-headed-lite' ),
-            'red-headed-lite.webp',
-            array(),
-            'red-headed-lite'
-        );
-    }
-    ?>
-
-    <?php include RED_HEADED_PATH . 'partials/_page-nav.php'; ?>
+<?php
+/* Charte v1 §4 — canonical Hub cockpit (header + .fh-tab nav + 2-col grid). */
+Red_Headed_Admin::open_cockpit_shell( 'red-headed-lite-exports' );
+FH_UI_Helper::open_cockpit_main();
+?>
 
     <section class="pl-section">
         <div class="pl-section-head">
@@ -174,4 +165,16 @@ if ( isset( $_POST['rh_clear_logs'] ) && check_admin_referer( 'rh_clear_logs' ) 
             <?php endif; ?>
         <?php endif; ?>
     </section>
-</div>
+<?php
+/* ── SIDEBAR : CTA / navigation only. ── */
+FH_UI_Helper::close_cockpit_main();
+FH_UI_Helper::open_cockpit_sidebar( __( 'Quick actions', 'red-headed-lite' ) );
+FH_UI_Helper::render_sidebar_card( __( 'Quick actions', 'red-headed-lite' ), array(
+    array( 'icon' => '📊', 'label' => __( 'Dashboard', 'red-headed-lite' ),    'url' => admin_url( 'admin.php?page=red-headed-lite' ) ),
+    array( 'icon' => '📁', 'label' => __( 'Profiles', 'red-headed-lite' ),     'url' => admin_url( 'admin.php?page=red-headed-lite-settings-profiles' ) ),
+    array( 'icon' => '🛒', 'label' => __( 'WC Orders', 'red-headed-lite' ),    'url' => admin_url( 'edit.php?post_type=shop_order' ) ),
+    array( 'icon' => '📡', 'label' => __( 'Destinations', 'red-headed-lite' ), 'url' => admin_url( 'admin.php?page=red-headed-lite-settings-destinations' ) ),
+) );
+FH_UI_Helper::close_cockpit_sidebar();
+FH_UI_Helper::close_cockpit();
+?>
