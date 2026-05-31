@@ -42,6 +42,11 @@ class Pelican_Soft_Lock {
             'webhooks'           => true,
             'multilingual'       => true,
             'profile_unlimited'  => true,  /* Lite: 1 profile only */
+            /* Structured-output suite (Pro) */
+            'json_structure'     => true,  /* labeled / nested / bare JSON shapes */
+            'filename_pattern'   => true,  /* custom output filename pattern at build time */
+            'split_per_order'    => true,  /* one file per order on a batch run */
+            'dest_local_folder'  => true,  /* copy raw export into a watched folder */
         );
     }
     public static function is_locked( $feature ) {

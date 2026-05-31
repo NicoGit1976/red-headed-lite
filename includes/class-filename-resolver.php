@@ -57,13 +57,20 @@ class Pelican_Filename_Resolver {
             '{date}'      => current_time( 'Y-m-d' ),
             '{time}'      => current_time( 'H-i-s' ),
             '{datetime}'  => current_time( 'Y-m-d_H-i-s' ),
+            /* EU-style export-time tokens (day-month-year). */
+            '{date_eu}'     => current_time( 'd-m-Y' ),
+            '{datetime_eu}' => current_time( 'd-m-Y-H-i-s' ),
             '{timestamp}' => (string) current_time( 'timestamp' ),
             '{random}'    => wp_generate_password( 6, false ),
-            '{order_id}'       => '',
-            '{order_number}'   => '',
-            '{customer_id}'    => '',
-            '{customer_email}' => '',
-            '{customer_name}'  => '',
+            '{order_id}'        => '',
+            '{order_number}'    => '',
+            '{customer_id}'     => '',
+            '{customer_email}'  => '',
+            '{customer_name}'   => '',
+            /* First-order creation date (EU style) — for one-file-per-order naming. */
+            '{order_date}'      => '',
+            '{order_time}'      => '',
+            '{order_datetime}'  => '',
         );
 
         $first = isset( $context['first_order'] ) ? $context['first_order'] : null;
@@ -74,6 +81,12 @@ class Pelican_Filename_Resolver {
             $repl['{customer_email}'] = sanitize_file_name( (string) $first->get_billing_email() );
             $name = trim( $first->get_billing_first_name() . ' ' . $first->get_billing_last_name() );
             $repl['{customer_name}']  = $name ? sanitize_file_name( $name ) : '';
+            $created = $first->get_date_created();
+            if ( $created ) {
+                $repl['{order_date}']     = $created->date( 'd-m-Y' );
+                $repl['{order_time}']     = $created->date( 'H-i-s' );
+                $repl['{order_datetime}'] = $created->date( 'd-m-Y-H-i-s' );
+            }
         }
 
         $resolved = strtr( $pattern, $repl );
@@ -93,9 +106,14 @@ class Pelican_Filename_Resolver {
             '{date}'            => 'Y-m-d',
             '{time}'            => 'H-i-s',
             '{datetime}'        => 'Y-m-d_H-i-s',
+            '{date_eu}'         => 'd-m-Y',
+            '{datetime_eu}'     => 'd-m-Y-H-i-s',
             '{timestamp}'       => __( 'Unix epoch', 'pelican' ),
             '{order_id}'        => __( 'First order WP ID', 'pelican' ),
             '{order_number}'    => __( 'First order number (e.g. e-4123)', 'pelican' ),
+            '{order_date}'      => __( 'First order date (d-m-Y)', 'pelican' ),
+            '{order_time}'      => __( 'First order time (H-i-s)', 'pelican' ),
+            '{order_datetime}'  => __( 'First order date+time (d-m-Y-H-i-s)', 'pelican' ),
             '{customer_id}'     => __( 'First order customer ID', 'pelican' ),
             '{customer_email}'  => __( 'First order billing email', 'pelican' ),
             '{customer_name}'   => __( 'First order billing first + last name', 'pelican' ),

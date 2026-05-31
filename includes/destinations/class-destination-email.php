@@ -19,7 +19,13 @@ class Pelican_Destination_Email extends Pelican_Destination_Base {
                 return new \WP_Error( 'rate_limited', __( 'Email quota reached (30/24h Lite limit). Upgrade to Pro for unlimited emails.', 'pelican' ) );
             }
         }
-        $to = isset( $config['email'] ) ? sanitize_email( $config['email'] ) : '';
+        /* Recipient resolution: the profile editor stores the address under 'to'
+           (JS), older configs used 'email'; fall back to the saved default. */
+        $to_raw = '';
+        if ( ! empty( $config['to'] ) )        $to_raw = (string) $config['to'];
+        elseif ( ! empty( $config['email'] ) ) $to_raw = (string) $config['email'];
+        else                                   $to_raw = (string) get_option( 'pelican_default_email_to', '' );
+        $to = sanitize_email( $to_raw );
         if ( ! $to ) return new \WP_Error( 'no_recipient', __( 'No recipient email configured.', 'pelican' ) );
 
         $subject = sprintf(

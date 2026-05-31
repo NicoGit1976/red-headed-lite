@@ -88,10 +88,19 @@ class Pelican_REST_API {
         $uploads = wp_upload_dir();
         $abs = trailingslashit( $uploads['basedir'] ) . ltrim( (string) $row['file_path'], '/' );
         if ( ! file_exists( $abs ) ) return new \WP_Error( 'file_missing', __( 'File missing on disk.', 'pelican' ), array( 'status' => 410 ) );
-        $content = file_get_contents( $abs );
-        return new \WP_REST_Response( $content, 200, array(
-            'Content-Type'        => 'application/octet-stream',
-            'Content-Disposition' => 'attachment; filename="' . sanitize_file_name( basename( $abs ) ) . '"',
-        ) );
+        /* Stream the raw bytes and exit BEFORE the REST server JSON-encodes the
+           response. Returning the file content as a WP_REST_Response string makes
+           the server wrap it in quotes + escape it (double-encoded), which yields
+           a malformed download that editors refuse to open. */
+        $ext  = strtolower( pathinfo( $abs, PATHINFO_EXTENSION ) );
+        $mimes = array( 'json' => 'application/json', 'ndjson' => 'application/x-ndjson', 'csv' => 'text/csv', 'tsv' => 'text/tab-separated-values', 'xml' => 'application/xml', 'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'zip' => 'application/zip' );
+        $mime = isset( $mimes[ $ext ] ) ? $mimes[ $ext ] : 'application/octet-stream';
+        if ( function_exists( 'nocache_headers' ) ) nocache_headers();
+        while ( ob_get_level() > 0 ) { ob_end_clean(); }
+        header( 'Content-Type: ' . $mime . '; charset=utf-8' );
+        header( 'Content-Disposition: attachment; filename="' . sanitize_file_name( basename( $abs ) ) . '"' );
+        header( 'Content-Length: ' . (string) filesize( $abs ) );
+        readfile( $abs );
+        exit;
     }
 }

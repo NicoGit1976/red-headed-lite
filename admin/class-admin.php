@@ -17,6 +17,17 @@ class Pelican_Admin {
         add_action( 'wp_ajax_pelican_run_profile', array( $this, 'ajax_run_profile' ) );
         add_action( 'wp_ajax_pelican_preview_profile', array( $this, 'ajax_preview_profile' ) );
         add_action( 'wp_ajax_pelican_preview_job',     array( $this, 'ajax_preview_job' ) );
+        /* v1.4.41 — Tell the Hub to load its shared admin chrome (fh-admin-css) on
+           our pages. Headless Exports/Settings pages (parent=null) get a hook of
+           `admin_page_red-headed-lite-*` that doesn't contain "froggy-", so the
+           Hub's default chrome gate misses them and the header logo renders
+           unstyled (giant). Declaring our slug via the Hub's documented filter
+           makes the Hub enqueue its chrome on every red-headed-lite page. */
+        add_filter( 'the_froggy_hub_child_admin_slugs', array( $this, 'register_hub_chrome_slugs' ) );
+    }
+    public function register_hub_chrome_slugs( $slugs ) {
+        $slugs[] = 'red-headed-lite';
+        return (array) $slugs;
     }
     public function register_menu() {
         /* v1.4.13 — Cap lowered to 'manage_options' (was 'manage_woocommerce'). Admin

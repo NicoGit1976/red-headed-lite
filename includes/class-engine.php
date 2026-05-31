@@ -35,12 +35,14 @@ class Pelican_Engine {
         require_once $base . 'destinations/class-destination-email.php';
         require_once $base . 'destinations/class-destination-sftp.php';
         require_once $base . 'destinations/class-destination-local-zip.php';
+        require_once $base . 'destinations/class-destination-local-folder.php';
         require_once $base . 'destinations/class-destination-rest.php';
         require_once $base . 'destinations/class-destination-gdrive.php';
         require_once $base . 'destinations/class-destination-dispatcher.php';
 
         require_once $base . 'class-export-engine.php';
         require_once $base . 'class-profile-repo.php';
+        require_once $base . 'class-retry.php';
         require_once $base . 'class-cron.php';
         require_once $base . 'class-auto-trigger.php';
         require_once $base . 'class-rest-api.php';

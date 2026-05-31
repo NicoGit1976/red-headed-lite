@@ -314,6 +314,19 @@ $cap_hit  = ! $is_pro && count( $profiles ) >= 1;
                 </fieldset>
 
                 <fieldset class="pl-field">
+                    <legend class="pl-field-lbl">🔁 <?php esc_html_e( 'Retry on failure', 'pelican' ); ?> <?php echo wp_kses_post( Pelican_Soft_Lock::badge() ); ?></legend>
+                    <p class="pl-muted"><?php esc_html_e( 'If a destination is unreachable (e.g. the receiving ERP/SFTP server is down), re-attempt delivery automatically on each cron tick — with backoff — until it goes through. The export file is re-sent as-is (same filename). Relies on WP-cron / a server cron running.', 'pelican' ); ?></p>
+                    <label class="pl-checkbox" style="display:flex;gap:8px;align-items:center;">
+                        <input type="checkbox" id="pl-pf-retry-on-fail" <?php disabled( ! Pelican_Soft_Lock::is_available( 'cron' ) ); ?> />
+                        <span><?php esc_html_e( 'Re-deliver failed exports until received', 'pelican' ); ?></span>
+                    </label>
+                    <label class="pl-field-stack">
+                        <span class="pl-field-sublabel"><?php esc_html_e( 'Max attempts (0 = keep trying until success)', 'pelican' ); ?></span>
+                        <input type="number" id="pl-pf-retry-max" min="0" step="1" placeholder="0" <?php disabled( ! Pelican_Soft_Lock::is_available( 'cron' ) ); ?> />
+                    </label>
+                </fieldset>
+
+                <fieldset class="pl-field">
                     <legend class="pl-field-lbl">📤 <?php esc_html_e( 'Export mode', 'pelican' ); ?> <?php echo wp_kses_post( Pelican_Soft_Lock::badge() ); ?></legend>
                     <label class="pl-field-stack">
                         <span class="pl-field-sublabel"><?php esc_html_e( 'Row layout', 'pelican' ); ?></span>
@@ -327,6 +340,41 @@ $cap_hit  = ! $is_pro && count( $profiles ) >= 1;
                         <label class="pl-checkbox" style="display:inline-flex;margin-right:14px;"><input type="radio" name="pl-pf-line-item-fill" value="every" checked /> <span><?php esc_html_e( 'on every line', 'pelican' ); ?></span></label>
                         <label class="pl-checkbox" style="display:inline-flex;"><input type="radio" name="pl-pf-line-item-fill" value="first_only" /> <span><?php esc_html_e( 'first line only', 'pelican' ); ?></span></label>
                     </div>
+                </fieldset>
+
+                <fieldset class="pl-field" id="pl-pf-json-fieldset">
+                    <legend class="pl-field-lbl">🧱 <?php esc_html_e( 'JSON structure', 'pelican' ); ?> <?php echo wp_kses_post( Pelican_Soft_Lock::badge() ); ?></legend>
+                    <p class="pl-muted"><?php esc_html_e( 'Only applies to JSON / NDJSON formats. Shape the output to match a downstream schema (ERP, partner API…).', 'pelican' ); ?></p>
+                    <label class="pl-field-stack">
+                        <span class="pl-field-sublabel"><?php esc_html_e( 'Shape', 'pelican' ); ?></span>
+                        <select id="pl-pf-json-shape" <?php disabled( ! Pelican_Soft_Lock::is_available( 'json_structure' ) ); ?>>
+                            <option value=""><?php esc_html_e( 'Flat rows (internal keys)', 'pelican' ); ?></option>
+                            <option value="labeled"><?php esc_html_e( 'One object per order (column labels as keys)', 'pelican' ); ?></option>
+                            <option value="nested"><?php esc_html_e( 'Labeled + nested line items', 'pelican' ); ?></option>
+                        </select>
+                    </label>
+                    <label class="pl-field-stack" id="pl-pf-line-items-key-wrap" style="display:none;">
+                        <span class="pl-field-sublabel"><?php esc_html_e( 'Line-items key (nested shape)', 'pelican' ); ?></span>
+                        <input type="text" id="pl-pf-line-items-key" placeholder="items" />
+                        <small class="pl-muted"><?php esc_html_e( 'The JSON key that holds each order’s product lines — e.g. items, lines, products.', 'pelican' ); ?></small>
+                    </label>
+                    <label class="pl-checkbox" style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+                        <input type="checkbox" id="pl-pf-json-bare" />
+                        <span><?php esc_html_e( 'Bare array — no { meta, orders } wrapper', 'pelican' ); ?></span>
+                    </label>
+                </fieldset>
+
+                <fieldset class="pl-field">
+                    <legend class="pl-field-lbl">📄 <?php esc_html_e( 'Output file', 'pelican' ); ?> <?php echo wp_kses_post( Pelican_Soft_Lock::badge() ); ?></legend>
+                    <label class="pl-field-stack">
+                        <span class="pl-field-sublabel"><?php esc_html_e( 'Filename pattern', 'pelican' ); ?></span>
+                        <input type="text" id="pl-pf-filename-pattern" placeholder="export-{order_number}-{date}" <?php disabled( ! Pelican_Soft_Lock::is_available( 'filename_pattern' ) ); ?> />
+                        <small class="pl-muted"><?php esc_html_e( 'Placeholders: {order_datetime} {order_date} {order_time} {date_eu} {datetime_eu} {date} {time} {order_number} {records} {job_id} {random}. Extension is added automatically. Empty = auto-generated name.', 'pelican' ); ?></small>
+                    </label>
+                    <label class="pl-checkbox" style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+                        <input type="checkbox" id="pl-pf-split-per-order" <?php disabled( ! Pelican_Soft_Lock::is_available( 'split_per_order' ) ); ?> />
+                        <span><?php esc_html_e( 'One file per order (split a batch into individual files)', 'pelican' ); ?></span>
+                    </label>
                 </fieldset>
 
                 <fieldset class="pl-field">
@@ -352,17 +400,22 @@ $cap_hit  = ! $is_pro && count( $profiles ) >= 1;
                     <legend class="pl-field-lbl">⏰ <?php esc_html_e( 'Schedule', 'pelican' ); ?></legend>
                     <select id="pl-pf-schedule">
                         <option value="manual"><?php esc_html_e( 'Manual only', 'pelican' ); ?></option>
+                        <option value="every_5min"><?php esc_html_e( 'Every 5 minutes', 'pelican' ); ?></option>
+                        <option value="every_15min"><?php esc_html_e( 'Every 15 minutes', 'pelican' ); ?></option>
+                        <option value="every_30min"><?php esc_html_e( 'Every 30 minutes', 'pelican' ); ?></option>
                         <option value="hourly"><?php esc_html_e( 'Hourly', 'pelican' ); ?></option>
                         <option value="twicedaily"><?php esc_html_e( 'Twice daily', 'pelican' ); ?></option>
                         <option value="daily"><?php esc_html_e( 'Daily', 'pelican' ); ?></option>
                         <option value="weekly"><?php esc_html_e( 'Weekly', 'pelican' ); ?></option>
                     </select>
+                    <small class="pl-muted"><?php esc_html_e( 'Interval schedules rely on WP-cron, which only fires on site traffic. For precise timing (e.g. every 5 min), point a real server cron at wp-cron.php. To export the instant an order reaches a status, use Auto-trigger below instead — no cron needed.', 'pelican' ); ?></small>
                 </fieldset>
 
                 <fieldset class="pl-field">
                     <legend class="pl-field-lbl">⚡ <?php esc_html_e( 'Auto-trigger', 'pelican' ); ?></legend>
+                    <p class="pl-muted"><?php esc_html_e( 'Export each order automatically the instant it reaches a status — in real time, no cron needed. e.g. on a classic shop: “processing, completed” to export every paid + completed order. Leave empty to disable.', 'pelican' ); ?></p>
                     <label><span><?php esc_html_e( 'On status change to (comma-separated)', 'pelican' ); ?></span>
-                        <input type="text" id="pl-pf-auto-status" placeholder="completed" />
+                        <input type="text" id="pl-pf-auto-status" placeholder="processing, completed" />
                     </label>
                     <label><span><?php esc_html_e( 'Min total (€)', 'pelican' ); ?></span>
                         <input type="number" step="0.01" id="pl-pf-auto-mintotal" />

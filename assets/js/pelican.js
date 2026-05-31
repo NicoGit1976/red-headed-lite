@@ -68,6 +68,28 @@
         document.querySelectorAll( 'input[name="pl-pf-line-item-fill"]' ).forEach( function ( r ) { r.checked = ( r.value === liFill ); } );
         var pes = document.getElementById( 'pl-pf-post-export-status' );
         if ( pes ) pes.value = p.post_export_status || '';
+
+        /* Structured-output suite (Pro): JSON shape + nesting key + bare flag +
+           build-time filename pattern + one-file-per-order toggle. */
+        var truthy = function ( v ) { return v === '1' || v === 1 || v === true; };
+        var jShape = document.getElementById( 'pl-pf-json-shape' );
+        if ( jShape ) { jShape.value = p.json_shape || ''; jShape.addEventListener( 'change', toggleJsonShape ); }
+        var liKey = document.getElementById( 'pl-pf-line-items-key' );
+        if ( liKey ) liKey.value = p.line_items_key || '';
+        var jBare = document.getElementById( 'pl-pf-json-bare' );
+        if ( jBare ) jBare.checked = truthy( p.json_bare );
+        var fnPat = document.getElementById( 'pl-pf-filename-pattern' );
+        if ( fnPat ) fnPat.value = p.filename_pattern || '';
+        var splitPO = document.getElementById( 'pl-pf-split-per-order' );
+        if ( splitPO ) splitPO.checked = truthy( p.split_per_order );
+        var retryEl = document.getElementById( 'pl-pf-retry-on-fail' );
+        if ( retryEl ) retryEl.checked = truthy( p.retry_on_fail );
+        var retryMaxEl = document.getElementById( 'pl-pf-retry-max' );
+        if ( retryMaxEl ) retryMaxEl.value = ( p.retry_max != null && p.retry_max !== '' ) ? p.retry_max : '';
+        var fmtSel = document.getElementById( 'pl-pf-format' );
+        if ( fmtSel ) fmtSel.addEventListener( 'change', toggleJsonShape );
+        toggleJsonShape();
+
         if ( document.getElementById( 'pl-pf-auto-status' ) ) {
             var at = p.auto_trigger || {};
             document.getElementById( 'pl-pf-auto-status' ).value   = Array.isArray( at.on_status ) ? at.on_status.join( ', ' ) : ( at.on_status || '' );
@@ -90,7 +112,7 @@
             if ( typeof c === 'string' ) {
                 return { key: c, label: lookupLabel( c ) };
             }
-            return { key: c.key || '', label: c.label || lookupLabel( c.key ) };
+            return { key: c.key || '', label: c.label || lookupLabel( c.key ), value: c.value, expr: c.expr, cast: c.cast };
         } );
 
         if ( ! cols.length ) {
@@ -101,7 +123,7 @@
         }
 
         cols.forEach( function ( c ) {
-            ol.appendChild( buildActiveRow( c.key, c.label, { value: c.value, expr: c.expr } ) );
+            ol.appendChild( buildActiveRow( c.key, c.label, { value: c.value, expr: c.expr, cast: c.cast } ) );
         } );
         updateActiveCount();
         syncCatalogChecks();
@@ -118,15 +140,41 @@
         return ( s || '' ).replace( /["\\]/g, '\\$&' );
     }
 
+    /* Per-column output type / format. Lets JSON/CSV values match a fixed
+       downstream schema exactly (e.g. qty as text "300", total as "1440.00",
+       date as "18-05-2026 11:32"). */
+    function castSelectHtml( cast ) {
+        var opts = [
+            [ '', '— type —' ],
+            [ 'string', 'Text' ],
+            [ 'number', 'Number' ],
+            [ 'money2', 'Number · 2 dec (text)' ],
+            [ 'int', 'Whole number' ],
+            [ 'date:Y-m-d H:i:s', 'Date YYYY-MM-DD HH:MM:SS' ],
+            [ 'date:Y-m-d', 'Date YYYY-MM-DD' ],
+            [ 'date:d-m-Y H:i', 'Date DD-MM-YYYY HH:MM' ],
+            [ 'date:d-m-Y', 'Date DD-MM-YYYY' ],
+            [ 'date:d-m-Y H:i:s', 'Date DD-MM-YYYY HH:MM:SS' ]
+        ];
+        var cur = cast || '';
+        var html = '<select class="pl-col-cast" title="Output type / format" style="font-size:11px;max-width:170px;flex:0 0 auto;">';
+        opts.forEach( function ( o ) {
+            html += '<option value="' + o[0].replace( /"/g, '&quot;' ) + '"' + ( o[0] === cur ? ' selected' : '' ) + '>' + o[1] + '</option>';
+        } );
+        return html + '</select>';
+    }
+
     function buildActiveRow( key, label, extra ) {
         var li = document.createElement( 'li' );
         li.className = 'pl-cols-active-row';
         li.draggable = true;
         li.dataset.key = key;
         var meta = '';
+        var cast = '';
         if ( extra && typeof extra === 'object' ) {
             if ( extra.value != null ) li.dataset.value = extra.value;
             if ( extra.expr  != null ) li.dataset.expr  = extra.expr;
+            if ( extra.cast  != null ) cast = extra.cast;
             if ( key.indexOf( 'static:' ) === 0 ) meta = ' <span class="pl-col-meta" style="font-size:11px;color:#94a3b8;">= ' + escHtml( extra.value || '' ) + '</span>';
             if ( key.indexOf( 'calc:' )   === 0 ) meta = ' <span class="pl-col-meta" style="font-size:11px;color:#94a3b8;">= ' + escHtml( extra.expr  || '' ) + '</span>';
         }
@@ -134,6 +182,7 @@
             '<span class="pl-drag-handle" aria-hidden="true">⋮⋮</span>' +
             '<input type="text" class="pl-col-active-label" value="' + ( label || key ).replace( /"/g, '&quot;' ) + '" />' +
             '<code class="pl-col-active-key">' + key + '</code>' + meta +
+            castSelectHtml( cast ) +
             '<button type="button" class="pl-btn pl-btn-sm pl-btn-danger pl-col-rm" aria-label="Remove">×</button>';
         li.querySelector( '.pl-col-rm' ).addEventListener( 'click', function () {
             li.remove();
@@ -304,6 +353,8 @@
             };
             if ( key.indexOf( 'static:' ) === 0 && row.dataset.value != null ) entry.value = row.dataset.value;
             if ( key.indexOf( 'calc:' )   === 0 && row.dataset.expr  != null ) entry.expr  = row.dataset.expr;
+            var castEl = row.querySelector( '.pl-col-cast' );
+            if ( castEl && castEl.value ) entry.cast = castEl.value;
             return entry;
         } );
     }
@@ -314,6 +365,18 @@
         var em = document.getElementById( 'pl-pf-export-mode' );
         var wrap = document.getElementById( 'pl-pf-line-item-fill-wrap' );
         if ( em && wrap ) wrap.style.display = ( em.value === 'per_line_item' ) ? '' : 'none';
+    }
+
+    /* Structured-output suite: show the JSON fieldset only for json/ndjson,
+       and the line-items key only for the nested shape. */
+    function toggleJsonShape() {
+        var fmt    = document.getElementById( 'pl-pf-format' );
+        var fs     = document.getElementById( 'pl-pf-json-fieldset' );
+        var isJson = fmt && ( fmt.value === 'json' || fmt.value === 'ndjson' );
+        if ( fs ) fs.style.display = isJson ? '' : 'none';
+        var shape = document.getElementById( 'pl-pf-json-shape' );
+        var wrap  = document.getElementById( 'pl-pf-line-items-key-wrap' );
+        if ( wrap ) wrap.style.display = ( shape && shape.value === 'nested' ) ? '' : 'none';
     }
 
     /* ────────── Destinations rows ────────── */
@@ -337,6 +400,7 @@
                     '<option value="gdrive">📁 Google Drive 🔒Pro</option>' +
                     '<option value="rest">🔗 REST 🔒Pro</option>' +
                     '<option value="local_zip">🗜 Local ZIP 🔒Pro</option>' +
+                    '<option value="local_folder">📂 Local folder 🔒Pro</option>' +
                     '<option value="download">⬇ Download 🔒Pro</option>' +
                 '</select>' +
                 '<button type="button" class="pl-btn pl-btn-sm pl-btn-danger pl-dest-rm">×</button>' +
@@ -437,6 +501,22 @@
         if ( document.getElementById( 'pl-pf-post-export-status' ) ) {
             profile.post_export_status = document.getElementById( 'pl-pf-post-export-status' ).value;
         }
+        var jShapeEl = document.getElementById( 'pl-pf-json-shape' );
+        if ( jShapeEl ) {
+            profile.json_shape     = jShapeEl.value;
+            var liEl = document.getElementById( 'pl-pf-line-items-key' );
+            profile.line_items_key = liEl ? liEl.value : '';
+            var bareEl = document.getElementById( 'pl-pf-json-bare' );
+            profile.json_bare = ( bareEl && bareEl.checked ) ? '1' : '';
+        }
+        var fnEl = document.getElementById( 'pl-pf-filename-pattern' );
+        if ( fnEl ) profile.filename_pattern = fnEl.value;
+        var spoEl = document.getElementById( 'pl-pf-split-per-order' );
+        if ( spoEl ) profile.split_per_order = spoEl.checked ? '1' : '';
+        var rEl = document.getElementById( 'pl-pf-retry-on-fail' );
+        if ( rEl ) profile.retry_on_fail = rEl.checked ? '1' : '';
+        var rmEl = document.getElementById( 'pl-pf-retry-max' );
+        if ( rmEl ) profile.retry_max = String( parseInt( rmEl.value, 10 ) || 0 );
         if ( document.getElementById( 'pl-pf-auto-status' ) ) {
             profile.auto_trigger = {
                 on_status: commaList( document.getElementById( 'pl-pf-auto-status' ).value ),
