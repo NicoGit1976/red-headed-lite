@@ -156,9 +156,11 @@ class Red_Headed_Export_Engine {
         $args = array( 'limit' => -1, 'orderby' => 'date', 'order' => 'DESC' );
         $args['status'] = isset( $filters['status'] ) && $filters['status'] ? (array) $filters['status'] : array_keys( wc_get_order_statuses() );
 
-        /* Auto-trigger override — single-order fetch path (used by Red_Headed_Auto_Trigger). */
+        /* Auto-trigger override — single-order fetch path (used by Red_Headed_Auto_Trigger + bulk action). */
         if ( ! empty( $filters['order_ids_override'] ) ) {
-            $args['post__in'] = array_map( 'intval', (array) $filters['order_ids_override'] );
+            $ids = array_map( 'intval', (array) $filters['order_ids_override'] );
+            $args['post__in'] = $ids;   /* legacy CPT storage */
+            $args['include']  = $ids;   /* HPOS storage */
             $args['status']   = array_keys( wc_get_order_statuses() ); /* don't re-filter by status */
         }
 
@@ -173,6 +175,17 @@ class Red_Headed_Export_Engine {
         if ( ! empty( $filters['customer_email'] ) ) $args['billing_email'] = sanitize_email( $filters['customer_email'] );
 
         $orders = wc_get_orders( $args );
+
+        /* v1.4.49 — HARD GUARANTEE for targeted exports (mirror of Pro v1.5.5):
+           some setups (legacy CPT, query-filtering plugins) silently ignore
+           post__in/include, leaking ALL orders into a single-order export.
+           Enforce the override post-fetch so it can NEVER contain another order. */
+        if ( ! empty( $filters['order_ids_override'] ) ) {
+            $want = array_flip( array_map( 'intval', (array) $filters['order_ids_override'] ) );
+            $orders = array_values( array_filter( (array) $orders, function ( $o ) use ( $want ) {
+                return is_a( $o, 'WC_Order' ) && isset( $want[ (int) $o->get_id() ] );
+            } ) );
+        }
 
         /* Post-fetch refinement (Pro). All advanced predicates run here so we can short-circuit
            cleanly when the Lite edition hits any locked filter. */
