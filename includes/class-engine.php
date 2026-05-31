@@ -2,11 +2,11 @@
 /**
  * Engine — orchestrator for Harlequin.
  *
- * @package Pelican
+ * @package Red_Headed_Lite
  */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-class Pelican_Engine {
+class Red_Headed_Engine {
     private static $instance = null;
     public static function instance() {
         if ( null === self::$instance ) self::$instance = new self();
@@ -17,7 +17,7 @@ class Pelican_Engine {
         $this->init_hooks();
     }
     private function load_dependencies() {
-        $base = PELICAN_PATH . 'includes/';
+        $base = RED_HEADED_PATH . 'includes/';
         require_once $base . 'class-soft-lock.php';
         require_once $base . 'class-installer.php';
         require_once $base . 'class-hub-registry.php';
@@ -52,31 +52,31 @@ class Pelican_Engine {
     }
     private function init_hooks() {
         add_action( 'plugins_loaded', array( $this, 'on_plugins_loaded' ) );
-        add_action( 'admin_init', array( 'Pelican_Installer', 'maybe_upgrade' ) );
+        add_action( 'admin_init', array( 'Red_Headed_Installer', 'maybe_upgrade' ) );
 
         /* v1.4.8 — disabled: Hub registry is single source of truth. */
-        // Pelican_Hub_Registry::init();
-        Pelican_I18n::init();
-        Pelican_Order_Tracker::init();
-        Pelican_Cron::init();
-        Pelican_Auto_Trigger::init();
-        Pelican_Webhooks::init();
-        Pelican_REST_API::init();
-        Pelican_Failure_Notifier::init();
-        Pelican_WC_Status::init();
+        // Red_Headed_Hub_Registry::init();
+        Red_Headed_I18n::init();
+        Red_Headed_Order_Tracker::init();
+        Red_Headed_Cron::init();
+        Red_Headed_Auto_Trigger::init();
+        Red_Headed_Webhooks::init();
+        Red_Headed_REST_API::init();
+        Red_Headed_Failure_Notifier::init();
+        Red_Headed_WC_Status::init();
     }
     public function on_plugins_loaded() {
-        load_plugin_textdomain( 'pelican', false, dirname( PELICAN_BASENAME ) . '/languages' );
+        load_plugin_textdomain( 'red-headed-lite', false, dirname( RED_HEADED_BASENAME ) . '/languages' );
     }
     public static function boot_admin() {
         if ( ! is_admin() ) return;
-        if ( ! class_exists( 'Pelican_Admin' ) ) {
-            require_once PELICAN_PATH . 'admin/class-admin.php';
+        if ( ! class_exists( 'Red_Headed_Admin' ) ) {
+            require_once RED_HEADED_PATH . 'admin/class-admin.php';
         }
-        if ( ! class_exists( 'Pelican_Bulk_Actions' ) ) {
-            require_once PELICAN_PATH . 'admin/class-bulk-actions.php';
+        if ( ! class_exists( 'Red_Headed_Bulk_Actions' ) ) {
+            require_once RED_HEADED_PATH . 'admin/class-bulk-actions.php';
         }
-        new Pelican_Admin();
-        new Pelican_Bulk_Actions();
+        new Red_Headed_Admin();
+        new Red_Headed_Bulk_Actions();
     }
 }

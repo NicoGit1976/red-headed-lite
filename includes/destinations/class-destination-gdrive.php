@@ -9,13 +9,13 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  * JSON. The actual upload is a curl POST to the Drive REST API
  * (multipart/related) once a valid access token is configured.
  *
- * @package Pelican
+ * @package Red_Headed_Lite
  */
-class Pelican_Destination_GDrive extends Pelican_Destination_Base {
+class Red_Headed_Destination_GDrive extends Red_Headed_Destination_Base {
     public static function ship( $file, $config ) {
         $token = isset( $config['access_token_enc'] ) ? self::decrypt( $config['access_token_enc'] ) : '';
         if ( ! $token ) {
-            return new \WP_Error( 'gdrive_no_token', __( 'Google Drive: no OAuth access token configured. Open Settings → Destinations → Google Drive to connect.', 'pelican' ) );
+            return new \WP_Error( 'gdrive_no_token', __( 'Google Drive: no OAuth access token configured. Open Settings → Destinations → Google Drive to connect.', 'red-headed-lite' ) );
         }
         $folder_id = isset( $config['folder_id'] ) ? sanitize_text_field( $config['folder_id'] ) : '';
 

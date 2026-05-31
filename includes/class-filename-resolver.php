@@ -1,7 +1,7 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 /**
- * Pelican_Filename_Resolver — single source of truth for filename pattern
+ * Red_Headed_Filename_Resolver — single source of truth for filename pattern
  * resolution across all destinations (gdrive, sftp, etc.).
  *
  * Pattern syntax: a string with curly-brace placeholders. Empty pattern → caller
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  *     {profile}      Sanitized profile name (e.g. "SFTP")
  *     {format}       File format (csv, json, xlsx, …)
  *     {records}      Number of records in this export
- *     {job_id}       pl_jobs.id of the current run
+ *     {job_id}       rh_jobs.id of the current run
  *
  *   Time
  *     {date}         Y-m-d (e.g. 2026-05-03)
@@ -31,11 +31,11 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  *   Random
  *     {random}       6-char alphanumeric (security / collision-avoidance)
  *
- * v1.4.26 (Pelican Pro+Lite).
+ * v1.4.26 (Red_Headed_Lite Pro+Lite).
  *
- * @package Pelican
+ * @package Red_Headed_Lite
  */
-class Pelican_Filename_Resolver {
+class Red_Headed_Filename_Resolver {
 
     /**
      * @param string $pattern Pattern with {placeholders}.
@@ -99,25 +99,25 @@ class Pelican_Filename_Resolver {
     /** List of placeholders for the helper text / tooltip. */
     public static function placeholders() {
         return array(
-            '{profile}'         => __( 'Profile name', 'pelican' ),
-            '{format}'          => __( 'csv | json | xlsx | xml | …', 'pelican' ),
-            '{records}'         => __( 'Row count', 'pelican' ),
-            '{job_id}'          => __( 'Job ID', 'pelican' ),
+            '{profile}'         => __( 'Profile name', 'red-headed-lite' ),
+            '{format}'          => __( 'csv | json | xlsx | xml | …', 'red-headed-lite' ),
+            '{records}'         => __( 'Row count', 'red-headed-lite' ),
+            '{job_id}'          => __( 'Job ID', 'red-headed-lite' ),
             '{date}'            => 'Y-m-d',
             '{time}'            => 'H-i-s',
             '{datetime}'        => 'Y-m-d_H-i-s',
             '{date_eu}'         => 'd-m-Y',
             '{datetime_eu}'     => 'd-m-Y-H-i-s',
-            '{timestamp}'       => __( 'Unix epoch', 'pelican' ),
-            '{order_id}'        => __( 'First order WP ID', 'pelican' ),
-            '{order_number}'    => __( 'First order number (e.g. e-4123)', 'pelican' ),
-            '{order_date}'      => __( 'First order date (d-m-Y)', 'pelican' ),
-            '{order_time}'      => __( 'First order time (H-i-s)', 'pelican' ),
-            '{order_datetime}'  => __( 'First order date+time (d-m-Y-H-i-s)', 'pelican' ),
-            '{customer_id}'     => __( 'First order customer ID', 'pelican' ),
-            '{customer_email}'  => __( 'First order billing email', 'pelican' ),
-            '{customer_name}'   => __( 'First order billing first + last name', 'pelican' ),
-            '{random}'          => __( '6-char alphanumeric (uniqueness)', 'pelican' ),
+            '{timestamp}'       => __( 'Unix epoch', 'red-headed-lite' ),
+            '{order_id}'        => __( 'First order WP ID', 'red-headed-lite' ),
+            '{order_number}'    => __( 'First order number (e.g. e-4123)', 'red-headed-lite' ),
+            '{order_date}'      => __( 'First order date (d-m-Y)', 'red-headed-lite' ),
+            '{order_time}'      => __( 'First order time (H-i-s)', 'red-headed-lite' ),
+            '{order_datetime}'  => __( 'First order date+time (d-m-Y-H-i-s)', 'red-headed-lite' ),
+            '{customer_id}'     => __( 'First order customer ID', 'red-headed-lite' ),
+            '{customer_email}'  => __( 'First order billing email', 'red-headed-lite' ),
+            '{customer_name}'   => __( 'First order billing first + last name', 'red-headed-lite' ),
+            '{random}'          => __( '6-char alphanumeric (uniqueness)', 'red-headed-lite' ),
         );
     }
 }

@@ -3,13 +3,13 @@
  * Soft Lock — Harlequin.
  * Pro features visible but locked when running Lite. Same pattern as the rest of the suite.
  *
- * @package Pelican
+ * @package Red_Headed_Lite
  */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-class Pelican_Soft_Lock {
+class Red_Headed_Soft_Lock {
     public static function edition() {
-        return defined( 'PELICAN_EDITION' ) ? PELICAN_EDITION : 'lite';
+        return defined( 'RED_HEADED_EDITION' ) ? RED_HEADED_EDITION : 'lite';
     }
     public static function is_pro() {
         return self::edition() === 'pro';
@@ -61,7 +61,7 @@ class Pelican_Soft_Lock {
     }
     public static function wrap( $feature, $callback ) {
         if ( self::is_available( $feature ) ) { call_user_func( $callback ); return; }
-        echo '<div class="pl-locked" data-feature="' . esc_attr( $feature ) . '" tabindex="0" role="button" aria-label="' . esc_attr__( 'Pro feature locked', 'pelican' ) . '">';
+        echo '<div class="pl-locked" data-feature="' . esc_attr( $feature ) . '" tabindex="0" role="button" aria-label="' . esc_attr__( 'Pro feature locked', 'red-headed-lite' ) . '">';
         echo '<div class="pl-locked-overlay">' . self::badge() . '</div>';
         echo '<div class="pl-locked-content" aria-hidden="true">';
         call_user_func( $callback );
@@ -73,7 +73,7 @@ class Pelican_Soft_Lock {
                 'code'    => 'feature_locked',
                 'message' => sprintf(
                     /* translators: %s = feature slug */
-                    __( 'This feature (%s) requires Red-Headed Pro.', 'pelican' ),
+                    __( 'This feature (%s) requires Red-Headed Pro.', 'red-headed-lite' ),
                     $feature
                 ),
             ), 403 );

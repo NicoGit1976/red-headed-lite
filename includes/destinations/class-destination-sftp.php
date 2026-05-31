@@ -5,19 +5,19 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  *
  * Both Lite and Pro support SFTP (Lite is capped to 1 destination per profile).
  *
- * @package Pelican
+ * @package Red_Headed_Lite
  */
-class Pelican_Destination_SFTP extends Pelican_Destination_Base {
+class Red_Headed_Destination_SFTP extends Red_Headed_Destination_Base {
     public static function ship( $file, $config ) {
         $host = isset( $config['host'] ) ? sanitize_text_field( $config['host'] ) : '';
         $port = isset( $config['port'] ) ? (int) $config['port'] : 22;
         $user = isset( $config['user'] ) ? sanitize_text_field( $config['user'] ) : '';
         $pass = isset( $config['pass_enc'] ) ? self::decrypt( $config['pass_enc'] ) : ( isset( $config['pass'] ) ? (string) $config['pass'] : '' );
         $dir  = isset( $config['path'] ) ? rtrim( sanitize_text_field( $config['path'] ), '/' ) : '/';
-        if ( ! $host || ! $user ) return new \WP_Error( 'sftp_missing', __( 'Missing SFTP host or user.', 'pelican' ) );
+        if ( ! $host || ! $user ) return new \WP_Error( 'sftp_missing', __( 'Missing SFTP host or user.', 'red-headed-lite' ) );
 
         /* v1.4.24 — Optional filename pattern. */
-        $remote_name = Pelican_Filename_Resolver::resolve(
+        $remote_name = Red_Headed_Filename_Resolver::resolve(
             isset( $config['filename_pattern'] ) ? $config['filename_pattern'] : '',
             array(
                 'file'         => $file,
@@ -35,10 +35,10 @@ class Pelican_Destination_SFTP extends Pelican_Destination_Base {
             try {
                 $sftp = new \phpseclib3\Net\SFTP( $host, $port );
                 if ( ! $sftp->login( $user, $pass ) ) {
-                    return new \WP_Error( 'sftp_auth', __( 'SFTP authentication failed.', 'pelican' ) );
+                    return new \WP_Error( 'sftp_auth', __( 'SFTP authentication failed.', 'red-headed-lite' ) );
                 }
                 if ( ! $sftp->put( $remote_path, $file, \phpseclib3\Net\SFTP::SOURCE_LOCAL_FILE ) ) {
-                    return new \WP_Error( 'sftp_put', __( 'SFTP upload failed.', 'pelican' ) );
+                    return new \WP_Error( 'sftp_put', __( 'SFTP upload failed.', 'red-headed-lite' ) );
                 }
                 return true;
             } catch ( \Throwable $e ) {
@@ -47,17 +47,17 @@ class Pelican_Destination_SFTP extends Pelican_Destination_Base {
         }
         if ( function_exists( 'ssh2_connect' ) ) {
             $conn = @ssh2_connect( $host, $port );
-            if ( ! $conn ) return new \WP_Error( 'sftp_connect', __( 'SSH2 connect failed.', 'pelican' ) );
-            if ( ! @ssh2_auth_password( $conn, $user, $pass ) ) return new \WP_Error( 'sftp_auth', __( 'SSH2 auth failed.', 'pelican' ) );
+            if ( ! $conn ) return new \WP_Error( 'sftp_connect', __( 'SSH2 connect failed.', 'red-headed-lite' ) );
+            if ( ! @ssh2_auth_password( $conn, $user, $pass ) ) return new \WP_Error( 'sftp_auth', __( 'SSH2 auth failed.', 'red-headed-lite' ) );
             $sftp = @ssh2_sftp( $conn );
-            if ( ! $sftp ) return new \WP_Error( 'sftp_subsystem', __( 'SFTP subsystem failed.', 'pelican' ) );
+            if ( ! $sftp ) return new \WP_Error( 'sftp_subsystem', __( 'SFTP subsystem failed.', 'red-headed-lite' ) );
             $stream = @fopen( "ssh2.sftp://{$sftp}{$remote_path}", 'w' );
-            if ( ! $stream ) return new \WP_Error( 'sftp_open_remote', __( 'Cannot open remote path.', 'pelican' ) );
+            if ( ! $stream ) return new \WP_Error( 'sftp_open_remote', __( 'Cannot open remote path.', 'red-headed-lite' ) );
             $local = fopen( $file, 'r' );
             stream_copy_to_stream( $local, $stream );
             fclose( $local ); fclose( $stream );
             return true;
         }
-        return new \WP_Error( 'sftp_no_lib', __( 'SFTP library missing. Install phpseclib3 (composer install --no-dev) or enable PHP SSH2 extension.', 'pelican' ) );
+        return new \WP_Error( 'sftp_no_lib', __( 'SFTP library missing. Install phpseclib3 (composer install --no-dev) or enable PHP SSH2 extension.', 'red-headed-lite' ) );
     }
 }

@@ -15,26 +15,26 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  *
  * Pro feature (gated by the dispatcher via 'dest_local_folder').
  *
- * @package Pelican
+ * @package Red_Headed_Lite
  */
-class Pelican_Destination_Local_Folder extends Pelican_Destination_Base {
+class Red_Headed_Destination_Local_Folder extends Red_Headed_Destination_Base {
 
     public static function ship( $file, $config ) {
         if ( ! $file || ! file_exists( $file ) ) {
-            return new \WP_Error( 'no_source', __( 'Export file missing on disk.', 'pelican' ) );
+            return new \WP_Error( 'no_source', __( 'Export file missing on disk.', 'red-headed-lite' ) );
         }
         $dir = self::resolve_dir( isset( $config['path'] ) ? (string) $config['path'] : '' );
         if ( is_wp_error( $dir ) ) return $dir;
 
         if ( ! wp_mkdir_p( $dir ) ) {
-            return new \WP_Error( 'mkdir_failed', __( 'Could not create the target folder.', 'pelican' ) );
+            return new \WP_Error( 'mkdir_failed', __( 'Could not create the target folder.', 'red-headed-lite' ) );
         }
         if ( ! is_writable( $dir ) ) {
-            return new \WP_Error( 'not_writable', __( 'Target folder is not writable.', 'pelican' ) );
+            return new \WP_Error( 'not_writable', __( 'Target folder is not writable.', 'red-headed-lite' ) );
         }
         $dest = trailingslashit( $dir ) . basename( $file );
         if ( ! @copy( $file, $dest ) ) {
-            return new \WP_Error( 'copy_failed', __( 'Could not copy the file to the target folder.', 'pelican' ) );
+            return new \WP_Error( 'copy_failed', __( 'Could not copy the file to the target folder.', 'red-headed-lite' ) );
         }
         return true;
     }
@@ -54,6 +54,13 @@ class Pelican_Destination_Local_Folder extends Pelican_Destination_Base {
         $path = preg_replace( '#\.\.+/#', '', $path );
 
         $is_abs  = ( isset( $path[0] ) && $path[0] === '/' ) || preg_match( '#^[A-Za-z]:/#', $path );
+        /* Tolerate a leading "wp-content/" on a RELATIVE path (common user input).
+           Relative paths resolve under wp-content already, so a value such as
+           "wp-content/ORDERS EXPORTS" would otherwise double to
+           wp-content/wp-content/ORDERS EXPORTS. Strip it for relative paths only. */
+        if ( ! $is_abs ) {
+            $path = preg_replace( '#^wp-content/#i', '', $path );
+        }
         $content = defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : ABSPATH . 'wp-content';
         $dir     = $is_abs ? $path : trailingslashit( $content ) . ltrim( $path, '/' );
         $dir     = rtrim( $dir, '/' );
@@ -77,7 +84,7 @@ class Pelican_Destination_Local_Folder extends Pelican_Destination_Base {
                 if ( $base && strpos( $real, $base ) === 0 ) { $ok = true; break; }
             }
             if ( ! $ok ) {
-                return new \WP_Error( 'path_outside', __( 'The folder must be inside wp-content or the WordPress root.', 'pelican' ) );
+                return new \WP_Error( 'path_outside', __( 'The folder must be inside wp-content or the WordPress root.', 'red-headed-lite' ) );
             }
         }
         return $dir;

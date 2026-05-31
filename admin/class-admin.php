@@ -2,21 +2,21 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 /**
  * Admin — registers the menu under Froggy Hub (no top-level WP menu) and
- * enqueues assets on Pelican pages.
+ * enqueues assets on Red_Headed_Lite pages.
  *
- * @package Pelican
+ * @package Red_Headed_Lite
  */
-class Pelican_Admin {
+class Red_Headed_Admin {
     public function __construct() {
         /* v1.4.14 — prio 110 (was 11). See red-headed-pro v1.4.16 commit. Hub
-           registers parent 'froggy-hub' at prio 98 — Pelican must fire AFTER. */
+           registers parent 'froggy-hub' at prio 98 — Red_Headed_Lite must fire AFTER. */
         add_action( 'admin_menu', array( $this, 'register_menu' ), 110 );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
-        add_action( 'wp_ajax_pelican_save_profile', array( $this, 'ajax_save_profile' ) );
-        add_action( 'wp_ajax_pelican_delete_profile', array( $this, 'ajax_delete_profile' ) );
-        add_action( 'wp_ajax_pelican_run_profile', array( $this, 'ajax_run_profile' ) );
-        add_action( 'wp_ajax_pelican_preview_profile', array( $this, 'ajax_preview_profile' ) );
-        add_action( 'wp_ajax_pelican_preview_job',     array( $this, 'ajax_preview_job' ) );
+        add_action( 'wp_ajax_red_headed_save_profile', array( $this, 'ajax_save_profile' ) );
+        add_action( 'wp_ajax_red_headed_delete_profile', array( $this, 'ajax_delete_profile' ) );
+        add_action( 'wp_ajax_red_headed_run_profile', array( $this, 'ajax_run_profile' ) );
+        add_action( 'wp_ajax_red_headed_preview_profile', array( $this, 'ajax_preview_profile' ) );
+        add_action( 'wp_ajax_red_headed_preview_job',     array( $this, 'ajax_preview_job' ) );
         /* v1.4.41 — Tell the Hub to load its shared admin chrome (fh-admin-css) on
            our pages. Headless Exports/Settings pages (parent=null) get a hook of
            `admin_page_red-headed-lite-*` that doesn't contain "froggy-", so the
@@ -37,9 +37,9 @@ class Pelican_Admin {
            shared in-page nav at the top (Dashboard / Exports / Settings). */
         /* v1.4.12 — Dashboard registered under 'froggy-hub' parent so Hub placeholder
            dedup catches it (no double menu entry, no redirect loop). */
-        add_submenu_page( 'froggy-hub', __( 'Red Headed Dashboard', 'pelican' ), 'Red Headed', $cap, 'red-headed-lite', array( $this, 'render_dashboard' ) );
-        add_submenu_page( null, __( 'Red Headed Exports',   'pelican' ), '', $cap, 'red-headed-lite-exports',  array( $this, 'render_exports' ) );
-        add_submenu_page( null, __( 'Red Headed Settings',  'pelican' ), '', $cap, 'red-headed-lite-settings', array( $this, 'render_settings' ) );
+        add_submenu_page( 'froggy-hub', __( 'Red Headed Dashboard', 'red-headed-lite' ), 'Red Headed', $cap, 'red-headed-lite', array( $this, 'render_dashboard' ) );
+        add_submenu_page( null, __( 'Red Headed Exports',   'red-headed-lite' ), '', $cap, 'red-headed-lite-exports',  array( $this, 'render_exports' ) );
+        add_submenu_page( null, __( 'Red Headed Settings',  'red-headed-lite' ), '', $cap, 'red-headed-lite-settings', array( $this, 'render_settings' ) );
 
         /* Settings deep-links forced ?tab= */
         foreach ( array( 'profiles', 'destinations', 'cron', 'webhooks', 'general' ) as $tab ) {
@@ -51,64 +51,64 @@ class Pelican_Admin {
     }
     public function enqueue_assets( $hook ) {
         if ( strpos( (string) $hook, 'red-headed-lite' ) === false ) return;
-        wp_enqueue_style( 'pelican', PELICAN_URL . 'assets/css/pelican.css', array(), PELICAN_VERSION );
-        wp_enqueue_script( 'pelican', PELICAN_URL . 'assets/js/pelican.js', array( 'jquery' ), PELICAN_VERSION, true );
-        wp_localize_script( 'pelican', 'PelicanData', array(
+        wp_enqueue_style( 'red-headed-lite', RED_HEADED_URL . 'assets/css/red-headed-lite.css', array(), RED_HEADED_VERSION );
+        wp_enqueue_script( 'red-headed-lite', RED_HEADED_URL . 'assets/js/red-headed-lite.js', array( 'jquery' ), RED_HEADED_VERSION, true );
+        wp_localize_script( 'red-headed-lite', 'RedHeadedData', array(
             'ajaxurl'   => admin_url( 'admin-ajax.php' ),
-            'nonce'     => wp_create_nonce( 'pelican' ),
+            'nonce'     => wp_create_nonce( 'red-headed-lite' ),
             'restUrl'   => rest_url(),
             'restNonce' => wp_create_nonce( 'wp_rest' ),
-            'edition'   => Pelican_Soft_Lock::edition(),
+            'edition'   => Red_Headed_Soft_Lock::edition(),
         ) );
     }
-    public function render_dashboard() { include PELICAN_PATH . 'partials/view-dashboard.php'; }
-    public function render_exports()   { include PELICAN_PATH . 'partials/view-exports.php'; }
-    public function render_settings()  { include PELICAN_PATH . 'partials/view-settings.php'; }
+    public function render_dashboard() { include RED_HEADED_PATH . 'partials/view-dashboard.php'; }
+    public function render_exports()   { include RED_HEADED_PATH . 'partials/view-exports.php'; }
+    public function render_settings()  { include RED_HEADED_PATH . 'partials/view-settings.php'; }
 
     /* ────────── AJAX ────────── */
     public function ajax_save_profile() {
-        check_ajax_referer( 'pelican', 'nonce' );
+        check_ajax_referer( 'red-headed-lite', 'nonce' );
         if ( ! current_user_can( 'manage_woocommerce' ) ) wp_send_json_error( array( 'message' => 'Insufficient permissions.' ), 403 );
         $data = isset( $_POST['profile'] ) ? json_decode( wp_unslash( $_POST['profile'] ), true ) : null;
         if ( ! is_array( $data ) ) wp_send_json_error( array( 'message' => 'Invalid profile JSON.' ) );
-        $id = Pelican_Profile_Repo::save( $data );
+        $id = Red_Headed_Profile_Repo::save( $data );
         if ( is_wp_error( $id ) ) wp_send_json_error( array( 'message' => $id->get_error_message() ) );
-        wp_send_json_success( Pelican_Profile_Repo::get( $id ) );
+        wp_send_json_success( Red_Headed_Profile_Repo::get( $id ) );
     }
     public function ajax_delete_profile() {
-        check_ajax_referer( 'pelican', 'nonce' );
+        check_ajax_referer( 'red-headed-lite', 'nonce' );
         if ( ! current_user_can( 'manage_woocommerce' ) ) wp_send_json_error( array( 'message' => 'Insufficient permissions.' ), 403 );
         $id = (int) ( $_POST['id'] ?? 0 );
-        $ok = Pelican_Profile_Repo::delete( $id );
+        $ok = Red_Headed_Profile_Repo::delete( $id );
         wp_send_json_success( array( 'deleted' => $ok ) );
     }
     public function ajax_run_profile() {
-        check_ajax_referer( 'pelican', 'nonce' );
+        check_ajax_referer( 'red-headed-lite', 'nonce' );
         if ( ! current_user_can( 'manage_woocommerce' ) ) wp_send_json_error( array( 'message' => 'Insufficient permissions.' ), 403 );
         $id = (int) ( $_POST['id'] ?? 0 );
-        $p  = Pelican_Profile_Repo::get( $id );
+        $p  = Red_Headed_Profile_Repo::get( $id );
         if ( ! $p ) wp_send_json_error( array( 'message' => 'Profile not found.' ) );
-        $job = Pelican_Export_Engine::run( $p, 'manual' );
+        $job = Red_Headed_Export_Engine::run( $p, 'manual' );
         if ( is_wp_error( $job ) ) wp_send_json_error( array( 'message' => $job->get_error_message() ) );
         global $wpdb;
-        $row = $wpdb->get_row( $wpdb->prepare( "SELECT records_count FROM {$wpdb->prefix}pl_jobs WHERE id = %d", $job ), ARRAY_A );
+        $row = $wpdb->get_row( $wpdb->prepare( "SELECT records_count FROM {$wpdb->prefix}rh_jobs WHERE id = %d", $job ), ARRAY_A );
         $payload = array( 'job_id' => $job, 'records' => isset( $row['records_count'] ) ? (int) $row['records_count'] : 0 );
         if ( $payload['records'] === 0 ) {
-            $payload['warning'] = __( 'Export ran but no orders matched your filters. Check the profile settings (statuses, date range).', 'pelican' );
+            $payload['warning'] = __( 'Export ran but no orders matched your filters. Check the profile settings (statuses, date range).', 'red-headed-lite' );
         }
         wp_send_json_success( $payload );
     }
     public function ajax_preview_profile() {
-        check_ajax_referer( 'pelican', 'nonce' );
+        check_ajax_referer( 'red-headed-lite', 'nonce' );
         if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( array( 'message' => 'Insufficient permissions.' ), 403 );
         $id = (int) ( $_POST['id'] ?? 0 );
-        $p  = Pelican_Profile_Repo::get( $id );
+        $p  = Red_Headed_Profile_Repo::get( $id );
         if ( ! $p ) wp_send_json_error( array( 'message' => 'Profile not found.' ) );
-        $orders  = Pelican_Export_Engine::fetch_orders( isset( $p['filters'] ) ? (array) $p['filters'] : array() );
-        $columns = Pelican_Export_Engine::normalize_columns( ! empty( $p['columns'] ) ? (array) $p['columns'] : Pelican_Export_Engine::default_columns() );
+        $orders  = Red_Headed_Export_Engine::fetch_orders( isset( $p['filters'] ) ? (array) $p['filters'] : array() );
+        $columns = Red_Headed_Export_Engine::normalize_columns( ! empty( $p['columns'] ) ? (array) $p['columns'] : Red_Headed_Export_Engine::default_columns() );
         $sample  = array_slice( $orders, 0, 5 );
         $rows = array_map( function ( $o ) use ( $columns ) {
-            $assoc = Pelican_Export_Engine::map_row( $o, $columns );
+            $assoc = Red_Headed_Export_Engine::map_row( $o, $columns );
             $vals = array();
             foreach ( $columns as $c ) {
                 $k = is_array( $c ) ? ( $c['key'] ?? '' ) : (string) $c;
@@ -123,11 +123,11 @@ class Pelican_Admin {
         ) );
     }
     public function ajax_preview_job() {
-        check_ajax_referer( 'pelican', 'nonce' );
+        check_ajax_referer( 'red-headed-lite', 'nonce' );
         if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( array( 'message' => 'Insufficient permissions.' ), 403 );
         $jid = (int) ( $_POST['id'] ?? 0 );
         global $wpdb;
-        $j = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}pl_jobs WHERE id = %d", $jid ), ARRAY_A );
+        $j = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}rh_jobs WHERE id = %d", $jid ), ARRAY_A );
         if ( ! $j || empty( $j['file_path'] ) ) wp_send_json_error( array( 'message' => 'Job or file not found.' ) );
         $u   = wp_upload_dir();
         $abs = trailingslashit( $u['basedir'] ) . ltrim( $j['file_path'], '/\\' );

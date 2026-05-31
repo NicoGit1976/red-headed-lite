@@ -5,18 +5,18 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  *
  * Lite: 30 emails / 24h sliding window. Pro: unlimited.
  *
- * @package Pelican
+ * @package Red_Headed_Lite
  */
-class Pelican_Destination_Email extends Pelican_Destination_Base {
-    const RATE_OPTION = 'pelican_email_rate';
+class Red_Headed_Destination_Email extends Red_Headed_Destination_Base {
+    const RATE_OPTION = 'red_headed_email_rate';
     const RATE_LIMIT_LITE = 30;
     const RATE_WINDOW = DAY_IN_SECONDS;
 
     public static function ship( $file, $config ) {
-        if ( ! Pelican_Soft_Lock::is_pro() ) {
+        if ( ! Red_Headed_Soft_Lock::is_pro() ) {
             $rate = self::current_rate();
             if ( $rate >= self::RATE_LIMIT_LITE ) {
-                return new \WP_Error( 'rate_limited', __( 'Email quota reached (30/24h Lite limit). Upgrade to Pro for unlimited emails.', 'pelican' ) );
+                return new \WP_Error( 'rate_limited', __( 'Email quota reached (30/24h Lite limit). Upgrade to Pro for unlimited emails.', 'red-headed-lite' ) );
             }
         }
         /* Recipient resolution: the profile editor stores the address under 'to'
@@ -24,20 +24,20 @@ class Pelican_Destination_Email extends Pelican_Destination_Base {
         $to_raw = '';
         if ( ! empty( $config['to'] ) )        $to_raw = (string) $config['to'];
         elseif ( ! empty( $config['email'] ) ) $to_raw = (string) $config['email'];
-        else                                   $to_raw = (string) get_option( 'pelican_default_email_to', '' );
+        else                                   $to_raw = (string) get_option( 'red_headed_default_email_to', '' );
         $to = sanitize_email( $to_raw );
-        if ( ! $to ) return new \WP_Error( 'no_recipient', __( 'No recipient email configured.', 'pelican' ) );
+        if ( ! $to ) return new \WP_Error( 'no_recipient', __( 'No recipient email configured.', 'red-headed-lite' ) );
 
         $subject = sprintf(
             /* translators: 1: site name */
-            __( '[%1$s] Red-Headed export — %2$s', 'pelican' ),
+            __( '[%1$s] Red-Headed export — %2$s', 'red-headed-lite' ),
             wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ),
             basename( $file )
         );
-        $body = isset( $config['email_body'] ) ? wp_kses_post( $config['email_body'] ) : __( 'Your Red-Headed order export is attached.', 'pelican' );
+        $body = isset( $config['email_body'] ) ? wp_kses_post( $config['email_body'] ) : __( 'Your Red-Headed order export is attached.', 'red-headed-lite' );
         $sent = wp_mail( $to, $subject, $body, array( 'Content-Type: text/html; charset=UTF-8' ), array( $file ) );
-        if ( ! $sent ) return new \WP_Error( 'mail_failed', __( 'wp_mail returned false.', 'pelican' ) );
-        if ( ! Pelican_Soft_Lock::is_pro() ) self::increment_rate();
+        if ( ! $sent ) return new \WP_Error( 'mail_failed', __( 'wp_mail returned false.', 'red-headed-lite' ) );
+        if ( ! Red_Headed_Soft_Lock::is_pro() ) self::increment_rate();
         return true;
     }
 
@@ -58,8 +58,8 @@ class Pelican_Destination_Email extends Pelican_Destination_Base {
         $sent = self::current_rate();
         return array(
             'sent_24h'  => $sent,
-            'limit'     => Pelican_Soft_Lock::is_pro() ? PHP_INT_MAX : self::RATE_LIMIT_LITE,
-            'remaining' => Pelican_Soft_Lock::is_pro() ? PHP_INT_MAX : max( 0, self::RATE_LIMIT_LITE - $sent ),
+            'limit'     => Red_Headed_Soft_Lock::is_pro() ? PHP_INT_MAX : self::RATE_LIMIT_LITE,
+            'remaining' => Red_Headed_Soft_Lock::is_pro() ? PHP_INT_MAX : max( 0, self::RATE_LIMIT_LITE - $sent ),
         );
     }
 }

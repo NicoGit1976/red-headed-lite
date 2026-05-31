@@ -1,17 +1,17 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 /**
- * Pelican_Order_Tracker — adds an "Exported" column on the WC orders list
+ * Red_Headed_Order_Tracker — adds an "Exported" column on the WC orders list
  * (both HPOS and legacy posts table). Source of truth = post/order meta:
  *   _rh_export_count       — how many times the order has been exported
  *   _rh_last_export_at     — datetime of the last export (mysql format)
- *   _rh_last_export_job_id — pl_jobs.id of the last export
+ *   _rh_last_export_job_id — rh_jobs.id of the last export
  *
- * v1.4.22 (Pelican Pro+Lite).
+ * v1.4.22 (Red_Headed_Lite Pro+Lite).
  *
- * @package Pelican
+ * @package Red_Headed_Lite
  */
-class Pelican_Order_Tracker {
+class Red_Headed_Order_Tracker {
 
     public static function init() {
         /* Legacy WC orders list (post type shop_order) */
@@ -27,11 +27,11 @@ class Pelican_Order_Tracker {
         foreach ( $columns as $key => $label ) {
             $new[ $key ] = $label;
             if ( $key === 'order_status' ) {
-                $new['rh_exported'] = '📦 ' . __( 'Exported', 'pelican' );
+                $new['rh_exported'] = '📦 ' . __( 'Exported', 'red-headed-lite' );
             }
         }
         if ( ! isset( $new['rh_exported'] ) ) {
-            $new['rh_exported'] = '📦 ' . __( 'Exported', 'pelican' );
+            $new['rh_exported'] = '📦 ' . __( 'Exported', 'red-headed-lite' );
         }
         return $new;
     }
@@ -57,7 +57,7 @@ class Pelican_Order_Tracker {
         $last = $order->get_meta( '_rh_last_export_at' );
         $tooltip = sprintf(
             /* translators: 1: count, 2: datetime */
-            esc_attr__( 'Exported %1$d time(s), last on %2$s', 'pelican' ),
+            esc_attr__( 'Exported %1$d time(s), last on %2$s', 'red-headed-lite' ),
             $count,
             $last ?: '—'
         );

@@ -4,7 +4,7 @@ Tags: woocommerce, export, csv, sftp, email
 Requires at least: 6.2
 Tested up to: 6.6
 Requires PHP: 8.1
-Stable tag: 1.4.46
+Stable tag: 1.4.47
 License: GPL-2.0-or-later
 
 Exports WooCommerce orders the simple way — manual or bulk to CSV, delivered by Email or SFTP, or downloaded straight to your computer. Part of Ultimate Woo Powertools (by The Lion Frog).
@@ -41,7 +41,7 @@ Exports WooCommerce orders the simple way — manual or bulk to CSV, delivered b
 * **Line-item export mode** (one row per product instead of one row per order)
 * **Post-export status change** (auto-set "processing" → "completed" after a successful export)
 * **Custom WC statuses** (export-aware non-native statuses, e.g. `wc-rh-exported`)
-* **REST API** endpoints (`/pelican/v1/profiles`, `/jobs`)
+* **REST API** endpoints (`/red-headed-lite/v1/profiles`, `/jobs`)
 * **HMAC-signed webhooks** (`export.generated`, `export.delivered`, `export.failed`, SHA-256, retry ×3 exponential)
 * **PolyLang & WPML** compatible (translatable email subject + body)
 
@@ -63,7 +63,7 @@ Pro features are visible inside Lite but soft-locked — upgrade in one click fr
 
 = 1.1.0 — 2026-04-30 =
 * Verbal rebrand: ships as **Red-Headed Lite — Simple Orders Export**.
-* Slug renamed `pelican-lite` → `red-headed-lite` (final naming).
+* Slug renamed `red-headed-lite-lite` → `red-headed-lite` (final naming).
 * Mascot: Red-Headed Poison Frog.
 * Backward-compatible with v1.0.0 data — no migration required.
 

@@ -5,11 +5,11 @@
  * Filter: 'the_froggy_hub_ecosystem' (Hub v1.4.0+ schema).
  * Plus stats hook for the global Hub dashboard.
  *
- * @package Pelican
+ * @package Red_Headed_Lite
  */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-class Pelican_Hub_Registry {
+class Red_Headed_Hub_Registry {
     public static function init() {
         add_filter( 'the_froggy_hub_ecosystem', array( __CLASS__, 'register' ), 10, 1 );
         add_filter( 'froggy_hub_plugin_stats', array( __CLASS__, 'stats' ), 10, 2 );
@@ -23,7 +23,7 @@ class Pelican_Hub_Registry {
         $ecosystem['red-headed'] = array(
             'title'    => 'Red Headed',
             'baseline' => 'Simple Orders Export',
-            'desc'  => __( 'Exports WooCommerce orders everywhere, anytime — manual + bulk to CSV via Email or SFTP. Mascot: Red-Headed Poison Frog.', 'pelican' ),
+            'desc'  => __( 'Exports WooCommerce orders everywhere, anytime — manual + bulk to CSV via Email or SFTP. Mascot: Red-Headed Poison Frog.', 'red-headed-lite' ),
             'lite'  => array(
                 'name' => 'The Lion Frog | Red-Headed Lite',
                 'slug' => 'red-headed-lite',
@@ -44,7 +44,7 @@ class Pelican_Hub_Registry {
     public static function stats( $stats, $slug ) {
         if ( ! in_array( $slug, array( 'woo-order-lite', 'woo-order-pro' ), true ) ) return $stats;
         global $wpdb;
-        $jobs = $wpdb->prefix . 'pl_jobs';
+        $jobs = $wpdb->prefix . 'rh_jobs';
         if ( ! is_array( $stats ) ) $stats = array();
         $stats['exports_total']      = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$jobs}" );
         $stats['exports_this_month'] = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$jobs} WHERE started_at >= DATE_FORMAT(NOW(), '%Y-%m-01')" );

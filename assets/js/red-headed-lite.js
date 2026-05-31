@@ -6,7 +6,7 @@
 ( function ( $ ) {
     'use strict';
 
-    var PD = window.PelicanData || {};
+    var PD = window.RedHeadedData || {};
     var ed = document.getElementById( 'pl-profile-editor' );
 
     function ajax( action, data ) {
@@ -525,7 +525,7 @@
             };
         }
 
-        ajax( 'pelican_save_profile', { profile: JSON.stringify( profile ) } )
+        ajax( 'red_headed_save_profile', { profile: JSON.stringify( profile ) } )
             .done( function ( r ) {
                 if ( r && r.success ) { window.location.reload(); }
                 else { alert( ( r && r.data && r.data.message ) || 'Save failed' ); }
@@ -535,11 +535,11 @@
 
     function deleteProfile( id ) {
         if ( ! window.confirm( 'Delete this profile? Past export logs will be kept.' ) ) return;
-        ajax( 'pelican_delete_profile', { id: id } ).done( function () { window.location.reload(); } );
+        ajax( 'red_headed_delete_profile', { id: id } ).done( function () { window.location.reload(); } );
     }
 
     function runProfile( id ) {
-        ajax( 'pelican_run_profile', { id: id } )
+        ajax( 'red_headed_run_profile', { id: id } )
             .done( function ( r ) {
                 if ( r && r.success ) {
                     var msg = '✓ Export complete — job #' + r.data.job_id + ' · ' + ( r.data.records || 0 ) + ' rows.';
@@ -588,13 +588,13 @@
     }
     function escHtml( s ) { return String( s ).replace( /[&<>"']/g, function ( c ) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]; } ); }
     function previewProfile( id ) {
-        ajax( 'pelican_preview_profile', { id: id } ).done( function ( r ) {
+        ajax( 'red_headed_preview_profile', { id: id } ).done( function ( r ) {
             if ( r && r.success ) showPreviewModal( '👁 Preview profile #' + id, r.data );
             else alert( ( r && r.data && r.data.message ) || 'Preview failed' );
         } );
     }
     function previewJob( id ) {
-        ajax( 'pelican_preview_job', { id: id } ).done( function ( r ) {
+        ajax( 'red_headed_preview_job', { id: id } ).done( function ( r ) {
             if ( r && r.success ) showPreviewModal( '👁 Preview export #' + id, r.data );
             else alert( ( r && r.data && r.data.message ) || 'Preview failed' );
         } );
@@ -643,7 +643,7 @@
                 var id = parseInt( this.dataset.id, 10 );
                 /* Read profile via REST to keep payload fresh */
                 $.ajax( {
-                    url: PD.restUrl + 'pelican/v1/profiles/' + id,
+                    url: PD.restUrl + 'red-headed-lite/v1/profiles/' + id,
                     headers: { 'X-WP-Nonce': PD.restNonce }
                 } ).done( function ( p ) { openEditor( p ); } );
             } );

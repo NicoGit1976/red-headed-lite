@@ -3,12 +3,12 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 /**
  * Shared in-page nav (Harlequin). Dashboard / Exports / Settings.
  *
- * @package Pelican
+ * @package Red_Headed_Lite
  */
 $_pl_pages = array(
-    'red-headed-lite'          => array( 'icon' => '📊', 'label' => __( 'Dashboard', 'pelican' ) ),
-    'red-headed-lite-exports'  => array( 'icon' => '📦', 'label' => __( 'Exports',   'pelican' ) ),
-    'red-headed-lite-settings' => array( 'icon' => '⚙️', 'label' => __( 'Settings',  'pelican' ) ),
+    'red-headed-lite'          => array( 'icon' => '📊', 'label' => __( 'Dashboard', 'red-headed-lite' ) ),
+    'red-headed-lite-exports'  => array( 'icon' => '📦', 'label' => __( 'Exports',   'red-headed-lite' ) ),
+    'red-headed-lite-settings' => array( 'icon' => '⚙️', 'label' => __( 'Settings',  'red-headed-lite' ) ),
 );
 $_pl_current = isset( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : 'red-headed-lite';
 if ( strpos( $_pl_current, 'red-headed-lite-settings' ) === 0 ) $_pl_current = 'red-headed-lite-settings';
