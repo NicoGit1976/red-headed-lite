@@ -3,7 +3,7 @@
  * Plugin Name:       Red Headed (Lite) — Simple Orders Export
  * Plugin URI:        https://thelionfrog.com
  * Description:       Exports WooCommerce orders everywhere, anytime — Lite edition. Manual + bulk to CSV via Email or SFTP. Mascot: Red-Headed Poison Frog. Part of Ultimate Woo Powertools (by The Lion Frog).
- * Version:           1.4.49
+ * Version:           1.4.50
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            The Lion Frog Team
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'RED_HEADED_VERSION', '1.4.49' );
+define( 'RED_HEADED_VERSION', '1.4.50' );
 define( 'RED_HEADED_EDITION',  'lite' );
 define( 'RED_HEADED_FILE',     __FILE__ );
 define( 'RED_HEADED_PATH',     plugin_dir_path( __FILE__ ) );
