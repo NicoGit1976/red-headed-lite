@@ -79,8 +79,17 @@ class Red_Headed_Installer {
 
     public static function uninstall() {
         global $wpdb;
-        $wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'rh_jobs' );
-        $wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'rh_profiles' );
+        /* Preserve the shared rh_profiles / rh_jobs tables if the sister edition
+           (red-headed-pro) is still active or installed — mirrors uninstall.php so a
+           Lite → Pro upgrade never loses export history. */
+        if ( ! function_exists( 'is_plugin_active' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+        if ( ! is_plugin_active( 'red-headed-pro/red-headed-pro.php' )
+            && ! file_exists( WP_PLUGIN_DIR . '/red-headed-pro/red-headed-pro.php' ) ) {
+            $wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'rh_jobs' );
+            $wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'rh_profiles' );
+        }
         delete_option( self::DB_VERSION_KEY );
         delete_option( 'red_headed_settings' );
         delete_option( 'red_headed_webhooks' );

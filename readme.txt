@@ -4,7 +4,7 @@ Tags: woocommerce, export, csv, sftp, email
 Requires at least: 6.2
 Tested up to: 6.6
 Requires PHP: 8.1
-Stable tag: 1.5.0
+Stable tag: 1.5.2
 License: GPL-2.0-or-later
 
 Exports WooCommerce orders the simple way — manual or bulk to CSV, delivered by Email or SFTP, or downloaded straight to your computer. Part of Ultimate Woo Powertools (by The Lion Frog).
@@ -54,6 +54,9 @@ Pro features are visible inside Lite but soft-locked — upgrade in one click fr
 3. Go to **Froggy Hub → Red-Headed** to configure.
 
 == Changelog ==
+
+= 1.5.2 =
+* **Fix:** the uninstaller no longer removes shared tables when the Pro edition is present; silenced a PHP 8 notice.
 
 = 1.4.40 - 2026-05-17 =
 * **Docs homogenization** — readme.txt rewritten to reflect actual Lite/Pro feature parity verified against the Soft_Lock matrix.

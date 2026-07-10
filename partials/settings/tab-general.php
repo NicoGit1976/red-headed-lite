@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 if ( isset( $_POST['rh_general_save'] ) && check_admin_referer( 'rh_general_save' ) && current_user_can( 'manage_woocommerce' ) ) {
     update_option( 'red_headed_retention_days', max( 0, (int) ( $_POST['retention_days'] ?? 30 ) ) );
     update_option( 'red_headed_default_filename_pattern', sanitize_text_field( $_POST['filename_pattern'] ?? 'orders-{{date}}-{{time}}' ) );
-    update_option( 'red_headed_decimal_separator', $_POST['decimal_sep'] === 'comma' ? 'comma' : 'dot' );
+    update_option( 'red_headed_decimal_separator', ( $_POST['decimal_sep'] ?? '' ) === 'comma' ? 'comma' : 'dot' );
     update_option( 'red_headed_email_subject', sanitize_text_field( $_POST['email_subject'] ?? '' ) );
     update_option( 'red_headed_email_body',    wp_kses_post(        $_POST['email_body']    ?? '' ) );
     update_option( 'red_headed_notify_on_failure',         ! empty( $_POST['notify_on_failure'] ) ? 1 : 0 );
