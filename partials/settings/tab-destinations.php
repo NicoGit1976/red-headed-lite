@@ -84,7 +84,7 @@ $rate = Red_Headed_Destination_Email::rate_status();
         <?php if ( Red_Headed_Soft_Lock::is_pro() ) : ?>
         <fieldset class="pl-card">
             <legend class="pl-card-title">📁 <?php esc_html_e( 'Google Drive', 'red-headed-lite' ); ?> <span class="pl-pill pl-pill-pro">PRO</span></legend>
-            <p class="pl-muted"><?php esc_html_e( 'OAuth flow — set up under each Pro profile destination. Server-side OAuth client coming in v1.1.', 'red-headed-lite' ); ?></p>
+            <p class="pl-muted"><?php esc_html_e( 'OAuth flow — set up under each Pro profile destination.', 'red-headed-lite' ); ?></p>
         </fieldset>
 
         <fieldset class="pl-card">

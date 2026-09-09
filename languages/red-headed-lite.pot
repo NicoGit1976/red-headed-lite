@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Red Headed (Lite) — Simple Orders Export 1.5.2\n"
+"Project-Id-Version: Red Headed (Lite) — Simple Orders Export 1.6.0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -492,7 +492,7 @@ msgstr ""
 msgid "None yet."
 msgstr ""
 
-msgid "OAuth flow — set up under each Pro profile destination. Server-side OAuth client coming in v1.1."
+msgid "OAuth flow — set up under each Pro profile destination."
 msgstr ""
 
 msgid "On status change to (comma-separated)"
